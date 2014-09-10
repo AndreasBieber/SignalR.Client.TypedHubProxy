@@ -4,17 +4,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8B6EA8A1-62B7-49BB-88BA-865B3D7AA370}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{C42C00E0-3B05-4A96-A866-100C6C49F53B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.AspNet.SignalR.Client</RootNamespace>
-    <AssemblyName>SignalR.Client.TypedHubProxy</AssemblyName>
+    <RootNamespace>Sample.Client</RootNamespace>
+    <AssemblyName>Sample.Client</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,16 +23,15 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\SignalR.Client.TypedHubProxy.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\SignalR.Client.TypedHubProxy.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.AspNet.SignalR.Client">
@@ -49,26 +49,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HubConnectionExtension.cs" />
-    <Compile Include="HubProxyExtension.cs" />
-    <Compile Include="InterfaceHubProxyBase.cs" />
-    <Compile Include="InterfaceHubProxyTemplate.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>InterfaceHubProxyTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Include="InterfaceHubProxyTemplate.Partial.cs" />
+    <Compile Include="Chat.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="InterfaceHubProxyTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>InterfaceHubProxyTemplate.cs</LastGenOutput>
-    </None>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <ProjectReference Include="..\Sample.Shared\Sample.Shared.csproj">
+      <Project>{BFCC290D-5BF9-404A-85E8-258A81F353DE}</Project>
+      <Name>Sample.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SignalR.Client.TypedHubProxy\SignalR.Client.TypedHubProxy.csproj">
+      <Project>{8b6ea8a1-62b7-49bb-88ba-865b3d7aa370}</Project>
+      <Name>SignalR.Client.TypedHubProxy</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

@@ -3,6 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.Client.TypedHubProxy", "SignalR.Client.TypedHubProxy\SignalR.Client.TypedHubProxy.csproj", "{8B6EA8A1-62B7-49BB-88BA-865B3D7AA370}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{12745B3A-DAFE-4B43-8A58-BC25B66330C3}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Client", "Sample.Client\Sample.Client.csproj", "{C42C00E0-3B05-4A96-A866-100C6C49F53B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Server", "Sample.Server\Sample.Server.csproj", "{0BECDB72-B309-427B-B73F-5BDC2DBEC3DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Shared", "Sample.Shared\Sample.Shared.csproj", "{BFCC290D-5BF9-404A-85E8-258A81F353DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +26,18 @@ Global
 		{8B6EA8A1-62B7-49BB-88BA-865B3D7AA370}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B6EA8A1-62B7-49BB-88BA-865B3D7AA370}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B6EA8A1-62B7-49BB-88BA-865B3D7AA370}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C42C00E0-3B05-4A96-A866-100C6C49F53B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C42C00E0-3B05-4A96-A866-100C6C49F53B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C42C00E0-3B05-4A96-A866-100C6C49F53B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C42C00E0-3B05-4A96-A866-100C6C49F53B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BECDB72-B309-427B-B73F-5BDC2DBEC3DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BECDB72-B309-427B-B73F-5BDC2DBEC3DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BECDB72-B309-427B-B73F-5BDC2DBEC3DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BECDB72-B309-427B-B73F-5BDC2DBEC3DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFCC290D-5BF9-404A-85E8-258A81F353DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFCC290D-5BF9-404A-85E8-258A81F353DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFCC290D-5BF9-404A-85E8-258A81F353DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFCC290D-5BF9-404A-85E8-258A81F353DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

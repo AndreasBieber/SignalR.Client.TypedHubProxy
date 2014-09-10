@@ -9,15 +9,27 @@ using Microsoft.CSharp;
 
 namespace Microsoft.AspNet.SignalR.Client
 {
+    /// <summary>
+    ///     Provides an extension method for Microsoft.AspNet.SignalR.Client.HubConnection.
+    /// </summary>
     public static class HubConnectionExtension
     {
         private const string ERR_INACCESSABLE = "\"{0}\" is inaccessible from outside due to its protection level.";
 
         private static readonly Dictionary<Type, Type> _compiledProxyClasses = new Dictionary<Type, Type>();
 
-        public static T CreateHubProxy<T>(this HubConnection connection, string hubName)
+        /// <summary>
+        ///     Creates a typed hubproxy of type T.
+        /// </summary>
+        /// <typeparam name="T">The interface to proxy.</typeparam>
+        /// <param name="connection">The HubConnection.</param>
+        /// <param name="hubName">The name of the hub.</param>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ConstraintException"></exception>
+        /// <returns>Returns the typed hubproxy.</returns>
+        public static T CreateHubProxy<T>(this HubConnection connection, string hubName) where T : class
         {
-            Type interfaceType = typeof(T);
+            Type interfaceType = typeof (T);
 
             if (!interfaceType.IsInterface)
             {
@@ -29,23 +41,25 @@ namespace Microsoft.AspNet.SignalR.Client
                 throw new ConstraintException(string.Format(ERR_INACCESSABLE, interfaceType.FullName.Replace("+", ".")));
             }
 
-            if (_compiledProxyClasses.ContainsKey(typeof(T)))
+            if (_compiledProxyClasses.ContainsKey(typeof (T)))
             {
-                return (T)Activator.CreateInstance(_compiledProxyClasses[typeof(T)], connection.CreateHubProxy(hubName));
+                return
+                    (T) Activator.CreateInstance(_compiledProxyClasses[typeof (T)], connection.CreateHubProxy(hubName));
             }
 
             MethodInfo[] methodInfos = interfaceType.GetMethods();
             var assembliesToReference = new List<string>
-            {
-                interfaceType.Assembly.Location,
-                typeof (IHubProxy).Assembly.Location
-            };
+                                        {
+                                            Assembly.GetExecutingAssembly().Location,
+                                            interfaceType.Assembly.Location,
+                                            typeof (IHubProxy).Assembly.Location
+                                        };
 
             foreach (MethodInfo methodInfo in methodInfos)
             {
                 ParameterInfo[] parameterInfos = methodInfo.GetParameters();
 
-                if (methodInfo.ReturnType != typeof(Task) && methodInfo.ReturnType.BaseType != typeof(Task))
+                if (methodInfo.ReturnType != typeof (Task) && methodInfo.ReturnType.BaseType != typeof (Task))
                 {
                     if (methodInfo.DeclaringType == null)
                     {
@@ -62,21 +76,26 @@ namespace Microsoft.AspNet.SignalR.Client
                             methodInfo.DeclaringType.FullName.Replace("+", "."),
                             methodInfo.Name,
                             methodParams,
-                            methodInfo.ReturnType == typeof(void) ? string.Empty : string.Format("<{0}>", methodInfo.ReturnType.FullName.Replace("+", "."))));
+                            methodInfo.ReturnType == typeof (void)
+                                ? string.Empty
+                                : string.Format("<{0}>", methodInfo.ReturnType.FullName.Replace("+", "."))));
                 }
 
                 if (!methodInfo.ReturnType.IsVisible)
                 {
-                    throw new ConstraintException(string.Format(ERR_INACCESSABLE, methodInfo.ReturnType.FullName.Replace("+", ".")));
+                    throw new ConstraintException(string.Format(ERR_INACCESSABLE,
+                        methodInfo.ReturnType.FullName.Replace("+", ".")));
                 }
 
                 ParameterInfo noPublicParam = parameterInfos.FirstOrDefault(p => !p.ParameterType.IsVisible);
                 if (noPublicParam != null)
                 {
-                    throw new ConstraintException(string.Format(ERR_INACCESSABLE, noPublicParam.ParameterType.FullName.Replace("+", ".")));
+                    throw new ConstraintException(string.Format(ERR_INACCESSABLE,
+                        noPublicParam.ParameterType.FullName.Replace("+", ".")));
                 }
 
-                List<string> assemblies = parameterInfos.Select(p => p.ParameterType.Assembly.Location).Distinct().ToList();
+                List<string> assemblies =
+                    parameterInfos.Select(p => p.ParameterType.Assembly.Location).Distinct().ToList();
                 assemblies.Add(methodInfo.ReturnType.Assembly.Location);
 
                 foreach (string assembly in assemblies)
@@ -89,14 +108,14 @@ namespace Microsoft.AspNet.SignalR.Client
             }
 
             var template = new InterfaceHubProxyTemplate
-            {
-                Interface = interfaceType
-            };
+                           {
+                               Interface = interfaceType
+                           };
 
             string code = template.TransformText();
 
             var codeProvider = new CSharpCodeProvider();
-            var compilerParameters = new CompilerParameters { GenerateInMemory = true, GenerateExecutable = false };
+            var compilerParameters = new CompilerParameters {GenerateInMemory = true, GenerateExecutable = false};
 
             foreach (string assemblyToReference in assembliesToReference)
             {
@@ -114,11 +133,12 @@ namespace Microsoft.AspNet.SignalR.Client
 
             Assembly compiledAssembly = results.CompiledAssembly;
 
-            Type generatedProxyClassType = compiledAssembly.GetType(string.Concat(interfaceType.Namespace, ".", interfaceType.Name, "Proxy"));
+            Type generatedProxyClassType =
+                compiledAssembly.GetType(string.Concat(interfaceType.Namespace, ".", interfaceType.Name, "Proxy"));
 
             _compiledProxyClasses.Add(interfaceType, generatedProxyClassType);
 
-            return (T)Activator.CreateInstance(generatedProxyClassType, connection.CreateHubProxy(hubName));
+            return (T) Activator.CreateInstance(generatedProxyClassType, connection.CreateHubProxy(hubName));
         }
     }
 }

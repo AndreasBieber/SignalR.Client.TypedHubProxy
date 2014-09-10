@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace <#=Interface.Namespace#>
 {
-    public class <#=Interface.Name#>Proxy : <#=Interface.FullName.Replace("+", ".")#>
+    public class <#=Interface.Name#>Proxy : InterfaceHubProxyBase, <#=Interface.FullName.Replace("+", ".")#>
     {
         private readonly IHubProxy _hubProxy;
 
