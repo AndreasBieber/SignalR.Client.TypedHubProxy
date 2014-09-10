@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>SignalR.Client.TypedHubProxy</id>
+        <version>1.0.0</version>
+        <title>Typed hub proxies for SignalR clients</title>
+        <authors>Andreas Bieber</authors>
+        <owners>1&amp;1 Internet AG</owners>
+        <licenseUrl>https://github.com/Gandalis/SignalR.Client.TypedHubProxy/blob/master/LICENSE.md</licenseUrl>
+        <projectUrl>https://github.com/Gandalis/SignalR.Client.TypedHubProxy</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>SignalR.Client.TypedHubProxy is a library which extends the SignalR.Client components to enabled typed hub proxies.</description>
+        <releaseNotes>https://github.com/Gandalis/SignalR.Client.TypedHubProxy/releases</releaseNotes>
+        <copyright>1&amp;1 Internet AG</copyright>
+        <language>en-US</language>
+        <tags>Microsoft AspNet SignalR AspNetSignalR Client TypedHubProxy Typed HubProxy</tags>
+        <dependencies>
+            <group targetFramework=".NETFramework4.5">
+                <dependency id="Microsoft.AspNet.SignalR.Client" version="2.1.1" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="SignalR.Client.TypedHubProxy\bin\Release\SignalR.Client.TypedHubProxy.dll" target="lib\net45\SignalR.Client.TypedHubProxy.dll" />
+        <file src="SignalR.Client.TypedHubProxy\bin\Release\SignalR.Client.TypedHubProxy.XML" target="lib\net45\SignalR.Client.TypedHubProxy.XML" />
+    </files>
+</package>
