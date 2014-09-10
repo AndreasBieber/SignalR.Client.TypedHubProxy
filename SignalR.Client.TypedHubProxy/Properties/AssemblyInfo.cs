@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("1&1 Internet AG")]
 [assembly: AssemblyProduct("SignalR.Client.TypedHubProxy")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("Copyright (c) 1&1 Internet AG")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
