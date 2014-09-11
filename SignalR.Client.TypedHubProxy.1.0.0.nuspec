@@ -3,7 +3,7 @@
     <metadata>
         <id>SignalR.Client.TypedHubProxy</id>
         <version>1.0.0</version>
-        <title>Typed hub proxies for SignalR clients</title>
+        <title>SignalR.Client.TypedHubProxy</title>
         <authors>Andreas Bieber</authors>
         <owners>1&amp;1 Internet AG</owners>
         <licenseUrl>https://github.com/Gandalis/SignalR.Client.TypedHubProxy/blob/master/LICENSE.md</licenseUrl>
