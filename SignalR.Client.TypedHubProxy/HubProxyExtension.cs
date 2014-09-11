@@ -74,7 +74,9 @@ namespace Microsoft.AspNet.SignalR.Client
                                 m => m.Name.Equals("On") && m.GetGenericArguments().Length == parameterInfos.Length);
 
                     onMethod = onMethod.MakeGenericMethod(parameterInfos.Select(pi => pi.ParameterType).ToArray());
-                    actionType = typeof (Action<>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray());
+                    actionType = parameterInfos.Length > 1 ?
+                        typeof(Action<,>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray()) :
+                        typeof(Action<>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray());
                 }
                 else
                 {
