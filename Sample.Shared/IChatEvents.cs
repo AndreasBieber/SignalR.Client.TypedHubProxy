@@ -1,6 +1,6 @@
 ﻿namespace Sample.Shared
 {
-    public interface IChatSubscriber
+    public interface IChatEvents
     {
         void NewMessage(string msg);
     }

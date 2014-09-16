@@ -5,18 +5,57 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNet.SignalR.Client.Hubs;
 using Microsoft.CSharp;
 
 namespace Microsoft.AspNet.SignalR.Client
 {
-    /// <summary>
-    ///     Provides an extension method for Microsoft.AspNet.SignalR.Client.HubConnection.
-    /// </summary>
-    public static class HubConnectionExtension
+    public static partial class TypedHubProxyExtensions
     {
         private const string ERR_INACCESSABLE = "\"{0}\" is inaccessible from outside due to its protection level.";
 
         private static readonly Dictionary<Type, Type> _compiledProxyClasses = new Dictionary<Type, Type>();
+
+        internal static IHubProxy GetHubProxy(this HubConnection hubConnection, string hubName)
+        {
+            FieldInfo hubsField = hubConnection.GetType()
+                .GetField("_hubs", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (hubsField == null)
+            {
+                throw new ConstraintException("Couldn't find \"_hubs\" field inside of the HubConnection.");
+            }
+
+            var hubs = (Dictionary<string, HubProxy>) hubsField.GetValue(hubConnection);
+
+            if (hubs.ContainsKey(hubName))
+            {
+                return hubs[hubName];
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        ///     Creates a strongly typed proxy for the hub with the specified name.
+        /// </summary>
+        /// <param name="connection">The <see cref="T:Microsoft.AspNet.SignalR.Client.HubConnection" />HubConnection.</param>
+        /// <param name="hubName">The name of the hub.</param>
+        /// <typeparam name="TServerHubInterface"></typeparam>
+        /// <typeparam name="TClientInterface"></typeparam>
+        public static ITypedHubProxy<TServerHubInterface, TClientInterface> CreateHubProxy
+            <TServerHubInterface, TClientInterface>(this HubConnection connection,
+                string hubName)
+            where TServerHubInterface : class
+            where TClientInterface : class
+        {
+            Type typedHubProxy = typeof (TypedHubProxy<,>).MakeGenericType(typeof (TServerHubInterface),
+                typeof (TClientInterface));
+            return
+                (ITypedHubProxy<TServerHubInterface, TClientInterface>)
+                    Activator.CreateInstance(typedHubProxy, BindingFlags.NonPublic | BindingFlags.Instance, null,
+                        new object[] {connection, hubName}, null);
+        }
 
         /// <summary>
         ///     Creates a typed hubproxy of type T.
@@ -27,6 +66,9 @@ namespace Microsoft.AspNet.SignalR.Client
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ConstraintException"></exception>
         /// <returns>Returns the typed hubproxy.</returns>
+        [Obsolete(
+            "This method will be removed in the next version of SignalR.Client.TypedHubProxy. Please use hubConnection.CreateHubProxy<TServerHubInterface, TClientInterface> instead.",
+            false)]
         public static T CreateHubProxy<T>(this HubConnection connection, string hubName) where T : class
         {
             Type interfaceType = typeof (T);
@@ -49,11 +91,11 @@ namespace Microsoft.AspNet.SignalR.Client
 
             MethodInfo[] methodInfos = interfaceType.GetMethods();
             var assembliesToReference = new List<string>
-                                        {
-                                            Assembly.GetExecutingAssembly().Location,
-                                            interfaceType.Assembly.Location,
-                                            typeof (IHubProxy).Assembly.Location
-                                        };
+            {
+                Assembly.GetExecutingAssembly().Location,
+                interfaceType.Assembly.Location,
+                typeof (IHubProxy).Assembly.Location
+            };
 
             foreach (MethodInfo methodInfo in methodInfos)
             {
@@ -108,9 +150,9 @@ namespace Microsoft.AspNet.SignalR.Client
             }
 
             var template = new InterfaceHubProxyTemplate
-                           {
-                               Interface = interfaceType
-                           };
+            {
+                Interface = interfaceType
+            };
 
             string code = template.TransformText();
 
