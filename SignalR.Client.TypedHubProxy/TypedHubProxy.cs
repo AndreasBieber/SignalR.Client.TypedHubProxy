@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNet.SignalR.Client.Hubs;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.AspNet.SignalR.Client
 {
@@ -12,14 +16,25 @@ namespace Microsoft.AspNet.SignalR.Client
     /// </summary>
     /// <typeparam name="TServerHubInterface">The interface of the server hub.</typeparam>
     /// <typeparam name="TClientInterface">The interface of the client events.</typeparam>
-    public sealed class TypedHubProxy<TServerHubInterface, TClientInterface> :
+    public class TypedHubProxy<TServerHubInterface, TClientInterface> :
         ITypedHubProxy<TServerHubInterface, TClientInterface>
     {
         private const string ERR_NOT_AN_INTERFACE = "\"{0}\" is not an interface.";
 
+        private readonly MethodInfo _convertStub =
+            typeof (TypedHubProxy<TServerHubInterface, TClientInterface>).GetMethod("Convert",
+                BindingFlags.NonPublic | BindingFlags.Static);
+
         private readonly IHubProxy _hubProxy;
 
-        internal TypedHubProxy(IHubProxy hubProxy)
+        private readonly Dictionary<Subscription, Action<IList<JToken>>> _subscriptions =
+            new Dictionary<Subscription, Action<IList<JToken>>>();
+
+        /// <summary>
+        ///     Ctor.
+        /// </summary>
+        /// <param name="hubProxy">HubProxy.</param>
+        protected TypedHubProxy(IHubProxy hubProxy)
         {
             _hubProxy = hubProxy;
         }
@@ -69,55 +84,55 @@ namespace Microsoft.AspNet.SignalR.Client
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn(
             Expression<Func<TClientInterface, Action>> eventToBind, Action callback)
         {
-            _hubProxy.On(eventToBind.GetMethodName(), callback);
+            CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
             Expression<Func<TClientInterface, Action<T>>> eventToBind, Action<T> callback)
         {
-            _hubProxy.On(eventToBind.GetMethodName(), callback);
+            CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
             Expression<Func<TClientInterface, Action<T1, T2>>> eventToBind,
             Action<T1, T2> callback)
         {
-            _hubProxy.On(eventToBind.GetMethodName(), callback);
+            CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
             Expression<Func<TClientInterface, Action<T1, T2, T3>>> eventToBind,
             Action<T1, T2, T3> callback)
         {
-            _hubProxy.On(eventToBind.GetMethodName(), callback);
+            CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4>>> eventToBind,
             Action<T1, T2, T3, T4> callback)
         {
-            _hubProxy.On(eventToBind.GetMethodName(), callback);
+            CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5>>> eventToBind,
             Action<T1, T2, T3, T4, T5> callback)
         {
-            _hubProxy.On(eventToBind.GetMethodName(), callback);
+            CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6>>> eventToBind,
             Action<T1, T2, T3, T4, T5, T6> callback)
         {
-            _hubProxy.On(eventToBind.GetMethodName(), callback);
+            CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6, T7>>> eventToBind,
             Action<T1, T2, T3, T4, T5, T6, T7> callback)
         {
-            _hubProxy.On(eventToBind.GetMethodName(), callback);
+            CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOnAll(object instance)
@@ -152,42 +167,85 @@ namespace Microsoft.AspNet.SignalR.Client
                                     .Select(p => string.Format("{0} {1}", p.ParameterType.Name, p.Name)))));
                 }
 
-                MethodInfo onMethod;
                 Type actionType;
 
                 if (parameterInfos.Any())
                 {
-                    onMethod =
-                        typeof (HubProxyExtensions).GetMethods(BindingFlags.Static | BindingFlags.Public)
-                            .First(
-                                m => m.Name.Equals("On") && m.GetGenericArguments().Length == parameterInfos.Length);
-
-                    onMethod = onMethod.MakeGenericMethod(parameterInfos.Select(pi => pi.ParameterType).ToArray());
                     actionType = parameterInfos.Length > 1
                         ? typeof (Action<,>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray())
                         : typeof (Action<>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray());
                 }
                 else
                 {
-                    onMethod =
-                        typeof (HubProxyExtensions).GetMethods(BindingFlags.Static | BindingFlags.Public)
-                            .First(
-                                m => m.Name.Equals("On") && m.GetGenericArguments().Length == 0);
-
                     actionType = typeof (Action);
                 }
 
                 Delegate actionDelegate = Delegate.CreateDelegate(actionType, instance, methodInfo);
 
 
-                onMethod.Invoke(null, new object[] {_hubProxy, methodInfo.Name, actionDelegate});
+                CreateSubscription(methodInfo.Name, actionDelegate);
             }
         }
 
         #endregion
 
-        void IDisposable.Dispose()
+        /// <summary>
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
         {
+            foreach (var kvp in _subscriptions)
+            {
+                kvp.Key.Received -= kvp.Value;
+            }
+
+            _subscriptions.Clear();
+        }
+
+        /// <summary>
+        ///     Deserialization of incoming data object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="serializer"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        protected static T Convert<T>(JToken obj, JsonSerializer serializer)
+        {
+            if (obj == null)
+            {
+                return default(T);
+            }
+
+            return obj.ToObject<T>(serializer);
+        }
+
+        private void CreateSubscription(string eventName, Delegate callback)
+        {
+            Subscription subscription = _hubProxy.Subscribe(eventName);
+
+            Type[] genericArguments = callback.GetType().GetGenericArguments();
+
+            Action<IList<JToken>> handler = args =>
+            {
+                if (genericArguments.Length == 0)
+                {
+                    callback.DynamicInvoke();
+                }
+                else
+                {
+                    callback.DynamicInvoke(
+                        genericArguments
+                            .Select(t => _convertStub.MakeGenericMethod(t))
+                            .Select(
+                                (convertMethod, i) =>
+                                    convertMethod.Invoke(null, new object[] {args[i], _hubProxy.JsonSerializer}))
+                            .ToArray());
+                }
+            };
+
+            subscription.Received += handler;
+            _subscriptions.Add(subscription, handler);
         }
     }
 }
