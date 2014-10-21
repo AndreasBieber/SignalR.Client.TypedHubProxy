@@ -93,11 +93,24 @@ namespace Microsoft.AspNet.SignalR.Client
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
+        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
+            Expression<Func<TClientInterface, Action<T>>> eventToBind, Func<T, bool> wherePredicate, Action<T> callback)
+        {
+            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+        }
+
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
             Expression<Func<TClientInterface, Action<T1, T2>>> eventToBind,
             Action<T1, T2> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
+        }
+
+        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
+            Expression<Func<TClientInterface, Action<T1, T2>>> eventToBind, Func<T1, T2, bool> wherePredicate,
+            Action<T1, T2> callback)
+        {
+            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
@@ -107,11 +120,25 @@ namespace Microsoft.AspNet.SignalR.Client
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
+        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
+            Expression<Func<TClientInterface, Action<T1, T2, T3>>> eventToBind, Func<T1, T2, T3, bool> wherePredicate,
+            Action<T1, T2, T3> callback)
+        {
+            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+        }
+
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4>>> eventToBind,
             Action<T1, T2, T3, T4> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
+        }
+
+        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
+            Expression<Func<TClientInterface, Action<T1, T2, T3, T4>>> eventToBind,
+            Func<T1, T2, T3, T4, bool> wherePredicate, Action<T1, T2, T3, T4> callback)
+        {
+            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
@@ -121,6 +148,14 @@ namespace Microsoft.AspNet.SignalR.Client
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
+        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
+            Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5>>> eventToBind,
+            Func<T1, T2, T3, T4, T5, bool> wherePredicate,
+            Action<T1, T2, T3, T4, T5> callback)
+        {
+            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+        }
+
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6>>> eventToBind,
             Action<T1, T2, T3, T4, T5, T6> callback)
@@ -128,11 +163,27 @@ namespace Microsoft.AspNet.SignalR.Client
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
+        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
+            Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6>>> eventToBind,
+            Func<T1, T2, T3, T4, T5, T6, bool> wherePredicate,
+            Action<T1, T2, T3, T4, T5, T6> callback)
+        {
+            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+        }
+
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6, T7>>> eventToBind,
             Action<T1, T2, T3, T4, T5, T6, T7> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
+        }
+
+        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
+            Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6, T7>>> eventToBind,
+            Func<T1, T2, T3, T4, T5, T6, T7, bool> wherePredicate,
+            Action<T1, T2, T3, T4, T5, T6, T7> callback)
+        {
+            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOnAll(object instance)
@@ -220,7 +271,7 @@ namespace Microsoft.AspNet.SignalR.Client
             return obj.ToObject<T>(serializer);
         }
 
-        private void CreateSubscription(string eventName, Delegate callback)
+        private void CreateSubscription(string eventName, Delegate callback, Delegate wherePredicate = null)
         {
             Subscription subscription = _hubProxy.Subscribe(eventName);
 
@@ -234,13 +285,24 @@ namespace Microsoft.AspNet.SignalR.Client
                 }
                 else
                 {
-                    callback.DynamicInvoke(
-                        genericArguments
-                            .Select(t => _convertStub.MakeGenericMethod(t))
-                            .Select(
-                                (convertMethod, i) =>
-                                    convertMethod.Invoke(null, new object[] {args[i], _hubProxy.JsonSerializer}))
-                            .ToArray());
+                    object[] genericArgs = genericArguments
+                        .Select(t => _convertStub.MakeGenericMethod(t))
+                        .Select(
+                            (convertMethod, i) =>
+                                convertMethod.Invoke(null, new object[] {args[i], _hubProxy.JsonSerializer}))
+                        .ToArray();
+
+                    if (wherePredicate != null)
+                    {
+                        if ((bool) wherePredicate.DynamicInvoke(genericArgs))
+                        {
+                            callback.DynamicInvoke(genericArgs);
+                        }
+                    }
+                    else
+                    {
+                        callback.DynamicInvoke(genericArgs);
+                    }
                 }
             };
 
