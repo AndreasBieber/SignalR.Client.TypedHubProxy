@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-
-namespace Microsoft.AspNet.SignalR.Client
+﻿namespace Microsoft.AspNet.SignalR.Client
 {
     public static partial class TypedHubProxyExtensions
     {
@@ -16,12 +13,7 @@ namespace Microsoft.AspNet.SignalR.Client
             where TServerHubInterface : class
             where TClientInterface : class
         {
-            Type typedHubProxy = typeof(TypedHubProxy<,>).MakeGenericType(typeof(TServerHubInterface),
-                typeof(TClientInterface));
-            return
-                (ITypedHubProxy<TServerHubInterface, TClientInterface>)
-                    Activator.CreateInstance(typedHubProxy, BindingFlags.NonPublic | BindingFlags.Instance, null,
-                        new object[] { hubProxy }, null);
+            return new TypedHubProxy<TServerHubInterface, TClientInterface>(hubProxy);
         }
     }
 }

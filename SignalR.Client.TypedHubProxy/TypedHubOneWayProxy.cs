@@ -34,7 +34,7 @@ namespace Microsoft.AspNet.SignalR.Client
                 throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof (TServerHubInterface).Name));
             }
 
-            _hubProxy = hubConnection.GetHubProxy(hubName) ?? hubConnection.CreateHubProxy(hubName);
+            _hubProxy = hubConnection.CreateHubProxy(hubName);
         }
 
         #region ITypedHubOneWayProxy implementations
