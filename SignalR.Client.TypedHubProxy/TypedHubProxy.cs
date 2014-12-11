@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client.Hubs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,83 +16,30 @@ namespace Microsoft.AspNet.SignalR.Client
     /// <typeparam name="TServerHubInterface">The interface of the server hub.</typeparam>
     /// <typeparam name="TClientInterface">The interface of the client events.</typeparam>
     public class TypedHubProxy<TServerHubInterface, TClientInterface> :
-        ITypedHubProxy<TServerHubInterface, TClientInterface>
+        TypedHubOneWayProxy<TServerHubInterface>, ITypedHubProxy<TServerHubInterface, TClientInterface>
+        where TServerHubInterface : class
+        where TClientInterface : class
     {
-        private const string ERR_NOT_AN_INTERFACE = "\"{0}\" is not an interface.";
-
         private readonly MethodInfo _convertStub =
             typeof (TypedHubProxy<TServerHubInterface, TClientInterface>).GetMethod("Convert",
                 BindingFlags.NonPublic | BindingFlags.Static);
 
-        private readonly IHubProxy _hubProxy;
-
         private readonly Dictionary<Subscription, Action<IList<JToken>>> _subscriptions =
             new Dictionary<Subscription, Action<IList<JToken>>>();
 
-        /// <summary>
-        ///     Ctor.
-        /// </summary>
-        /// <param name="hubProxy">HubProxy.</param>
-        protected TypedHubProxy(IHubProxy hubProxy)
+        internal TypedHubProxy(IHubProxy hubProxy) : base(hubProxy)
         {
-            _hubProxy = hubProxy;
         }
 
-        internal TypedHubProxy(HubConnection hubConnection, string hubName)
+        internal TypedHubProxy(HubConnection hubConnection, string hubName) : base(hubConnection, hubName)
         {
-            if (!typeof (TServerHubInterface).IsInterface)
-            {
-                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof (TServerHubInterface).Name));
-            }
-
             if (!typeof (TClientInterface).IsInterface)
             {
                 throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof (TClientInterface).Name));
             }
-
-            _hubProxy = hubConnection.GetHubProxy(hubName) ?? hubConnection.CreateHubProxy(hubName);
         }
 
         #region ITypedHubProxy implementations
-
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.Call(Expression<Action<TServerHubInterface>> call)
-        {
-            ((ITypedHubProxy<TServerHubInterface, TClientInterface>) this).CallAsync(call).Wait();
-        }
-
-        TResult ITypedHubProxy<TServerHubInterface, TClientInterface>.Call<TResult>(
-            Expression<Func<TServerHubInterface, TResult>> call)
-        {
-            return ((ITypedHubProxy<TServerHubInterface, TClientInterface>) this).CallAsync(call).Result;
-        }
-
-        Task ITypedHubProxy<TServerHubInterface, TClientInterface>.CallAsync(
-            Expression<Action<TServerHubInterface>> call)
-        {
-            ActionDetail invocation = call.GetActionDetails();
-            return _hubProxy.Invoke(invocation.MethodName, invocation.Parameters);
-        }
-
-        Task ITypedHubProxy<TServerHubInterface, TClientInterface>.CallAsync(
-            Expression<Func<TServerHubInterface, Task>> call)
-        {
-            ActionDetail invocation = call.GetActionDetails();
-            return _hubProxy.Invoke(invocation.MethodName, invocation.Parameters);
-        }
-
-        Task<TResult> ITypedHubProxy<TServerHubInterface, TClientInterface>.CallAsync<TResult>(
-            Expression<Func<TServerHubInterface, TResult>> call)
-        {
-            ActionDetail invocation = call.GetActionDetails();
-            return _hubProxy.Invoke<TResult>(invocation.MethodName, invocation.Parameters);
-        }
-
-        Task<TResult> ITypedHubProxy<TServerHubInterface, TClientInterface>.CallAsync<TResult>(
-            Expression<Func<TServerHubInterface, Task<TResult>>> call)
-        {
-            ActionDetail invocation = call.GetActionDetails();
-            return _hubProxy.Invoke<TResult>(invocation.MethodName, invocation.Parameters);
-        }
 
         void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn(
             Expression<Func<TClientInterface, Action>> eventToBind, Action callback)

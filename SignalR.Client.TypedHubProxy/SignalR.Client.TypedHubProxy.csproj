@@ -61,6 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionDetail.cs" />
+    <Compile Include="TypedHubOneWayProxy.cs" />
+    <Compile Include="ITypedHubOneWayProxy.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Extensions.Expression.cs" />
     <Compile Include="ITypedHubProxy.cs" />
