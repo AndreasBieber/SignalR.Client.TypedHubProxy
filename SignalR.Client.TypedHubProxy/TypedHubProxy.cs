@@ -74,8 +74,22 @@ namespace Microsoft.AspNet.SignalR.Client
             return _hubProxy.Invoke(invocation.MethodName, invocation.Parameters);
         }
 
+        Task ITypedHubProxy<TServerHubInterface, TClientInterface>.CallAsync(
+            Expression<Func<TServerHubInterface, Task>> call)
+        {
+            ActionDetail invocation = call.GetActionDetails();
+            return _hubProxy.Invoke(invocation.MethodName, invocation.Parameters);
+        }
+
         Task<TResult> ITypedHubProxy<TServerHubInterface, TClientInterface>.CallAsync<TResult>(
             Expression<Func<TServerHubInterface, TResult>> call)
+        {
+            ActionDetail invocation = call.GetActionDetails();
+            return _hubProxy.Invoke<TResult>(invocation.MethodName, invocation.Parameters);
+        }
+
+        Task<TResult> ITypedHubProxy<TServerHubInterface, TClientInterface>.CallAsync<TResult>(
+            Expression<Func<TServerHubInterface, Task<TResult>>> call)
         {
             ActionDetail invocation = call.GetActionDetails();
             return _hubProxy.Invoke<TResult>(invocation.MethodName, invocation.Parameters);
