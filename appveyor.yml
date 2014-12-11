@@ -1,0 +1,26 @@
+version: 2.2.{build}
+branches:
+  only:
+    - master
+#	- release
+
+os: Windows Server 2012 R2
+
+install:
+  - cmd: git submodule update --init
+  - ps:  .\tools\prebuild.ps1
+
+platform: Any CPU
+configuration: Release
+
+build:
+  publish_nuget: false
+
+build_script:
+  - ps:  .\tools\build.ps1
+
+artifacts:
+  - path: SignalR.Client.TypedHubProxy\bin\Release
+    name: Release
+
+  - path: SignalR.Client.TypedHubProxy\bin\*.nupkg
