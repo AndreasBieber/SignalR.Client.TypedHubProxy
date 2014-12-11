@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("SignalR.Client.TypedHubProxy")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("1&1 Internet AG")]
 [assembly: AssemblyProduct("SignalR.Client.TypedHubProxy")]
 [assembly: AssemblyCopyright("Copyright (c) 1&1 Internet AG")]

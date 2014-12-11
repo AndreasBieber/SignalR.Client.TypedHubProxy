@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+<package>
     <metadata>
         <id>SignalR.Client.TypedHubProxy</id>
         <version>2.2.0</version>
@@ -22,6 +22,7 @@
     </metadata>
     <files>
         <file src="bin\Release\SignalR.Client.TypedHubProxy.dll" target="lib\net45\SignalR.Client.TypedHubProxy.dll" />
-        <file src="bin\Release\SignalR.Client.TypedHubProxy.XML" target="lib\net45\SignalR.Client.TypedHubProxy.XML" />
+		<file src="bin\Release\SignalR.Client.TypedHubProxy.pdb" target="lib\net45\SignalR.Client.TypedHubProxy.pdb" />
+        <file src="bin\Release\SignalR.Client.TypedHubProxy.xml" target="lib\net45\SignalR.Client.TypedHubProxy.xml" />
     </files>
 </package>
