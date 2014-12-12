@@ -164,14 +164,14 @@ namespace SignalR.Client.TypedHubProxy.Tests
                     outParam7.Should().Be(inParam7, assertMessage, "outParam7", inParam7, outParam7);
                 }));
 
-            _testFixture.HubProxy.CallAsync(hub => hub.SendDelayed());
-            _testFixture.HubProxy.CallAsync(hub => hub.SendDelayed(inParam1));
-            _testFixture.HubProxy.CallAsync(hub => hub.SendDelayed(inParam1, inParam2));
-            _testFixture.HubProxy.CallAsync(hub => hub.SendDelayed(inParam1, inParam2, inParam3));
-            _testFixture.HubProxy.CallAsync(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4));
-            _testFixture.HubProxy.CallAsync(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4, inParam5));
-            _testFixture.HubProxy.CallAsync(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6));
-            _testFixture.HubProxy.CallAsync(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6, inParam7));
+            _testFixture.HubProxy.Call(hub => hub.SendDelayed());
+            _testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1));
+            _testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2));
+            _testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3));
+            _testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4));
+            _testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4, inParam5));
+            _testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6));
+            _testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6, inParam7));
 
             Task getAllResponsesTask = Task.Factory.StartNew(() =>
             {
@@ -184,10 +184,9 @@ namespace SignalR.Client.TypedHubProxy.Tests
                 }
             }, TaskCreationOptions.LongRunning);
 
-            Task.WaitAll(new []{getAllResponsesTask}, TimeSpan.FromSeconds(5))
+            Task.WaitAll(new []{getAllResponsesTask}, TimeSpan.FromSeconds(15))
                 .Should()
-                .BeTrue("because all responses should be received witin 5 seconds (got only {0} responses out of {1})", responses.Count(r => r.GotResponse), responses.Count);
-
+                .BeTrue("because all responses should be received witin 5 seconds (got {0} responses out of {1})", responses.Count(r => r.GotResponse), responses.Count);
 
             AsyncResult erroneousResult = responses.FirstOrDefault(r => r.Exception != null);
 
