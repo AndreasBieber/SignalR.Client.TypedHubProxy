@@ -21,6 +21,15 @@ namespace SignalR.Client.TypedHubProxy.Tests
         /// </summary>
         /// <param name="guid">Guid.</param>
         /// <param name="ms">Milliseconds.</param>
-        void SendDelayed(Guid guid, int ms);
+        void SendDelayedWithMs(Guid guid, int ms);
+
+        void SendDelayed();
+        void SendDelayed(int param1);
+        void SendDelayed(int param1, int param2);
+        void SendDelayed(int param1, int param2, int param3);
+        void SendDelayed(int param1, int param2, int param3, int param4);
+        void SendDelayed(int param1, int param2, int param3, int param4, int param5);
+        void SendDelayed(int param1, int param2, int param3, int param4, int param5, int param6);
+        void SendDelayed(int param1, int param2, int param3, int param4, int param5, int param6, int param7);
     }
 }
