@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -29,3 +30,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.0.1")]
 [assembly: AssemblyFileVersion("0.0.0")]
 [assembly: AssemblyInformationalVersion("0.0.0")]
+[assembly: InternalsVisibleTo("SignalR.Client.TypedHubProxy.Observable, PublicKey=" +
+    "00240000048000009400000006020000002400005253413100040000010001004518fffa729c90" +
+    "76f3bb900f9b7d8fbc363953bd2acd81b314502d7f2601d45bb7552f191f2e4b76e20897d4d6a5" +
+    "f653d542d6270333629e901ce24efc859e59bbecd1d3fcb9f46e93eaa5f6f55783d28dd0c95539" +
+    "2679ee496482373efa9b26bafe92a1bcf1af7c58a479a485f426b260d6fe030a4ae0f525d1cb58" +
+    "50e2badb")]
