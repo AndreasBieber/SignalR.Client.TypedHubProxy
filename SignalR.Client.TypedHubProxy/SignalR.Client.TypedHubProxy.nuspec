@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package>
     <metadata>
         <id>SignalR.Client.TypedHubProxy</id>
@@ -16,7 +16,7 @@
         <tags>Microsoft AspNet SignalR AspNetSignalR Client TypedHubProxy Typed HubProxy</tags>
         <dependencies>
             <group targetFramework=".NETFramework4.5">
-                <dependency id="Microsoft.AspNet.SignalR.Client" version="2.1.1" />
+                <!-- Dependencies added by build process -->
             </group>
         </dependencies>
     </metadata>
