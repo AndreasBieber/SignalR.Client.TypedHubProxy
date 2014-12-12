@@ -321,7 +321,11 @@ namespace Microsoft.AspNet.SignalR.Client
             };
 
             subscription.Received += handler;
-            _subscriptions.Add(subscription, handler);
+
+            if (!_subscriptions.ContainsKey(subscription))
+            {
+                _subscriptions.Add(subscription, handler);
+            }
         }
     }
 }
