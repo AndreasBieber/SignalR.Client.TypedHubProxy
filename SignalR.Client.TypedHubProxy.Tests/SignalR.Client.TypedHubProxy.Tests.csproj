@@ -84,12 +84,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HubConnectionFixture.cs" />
     <Compile Include="Hubs\TestHub.cs" />
     <Compile Include="ITestHub.cs" />
     <Compile Include="ITestHubClientEvents.cs" />
-    <Compile Include="TestFixture.cs" />
     <Compile Include="TypedHubProxyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypedHubFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
