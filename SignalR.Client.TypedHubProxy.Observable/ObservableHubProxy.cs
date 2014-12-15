@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using System.Reactive.Linq;
 
 namespace Microsoft.AspNet.SignalR.Client
 {
@@ -31,7 +30,7 @@ namespace Microsoft.AspNet.SignalR.Client
         IObservable<T> IObservableHubProxy<TServerHubInterface, TClientInterface>.Observe<T>(
             Expression<Func<TClientInterface, Action<T>>> eventToBind)
         {
-            return Observable.Create<T>(observer => _hubProxy.On<T>(eventToBind.GetMethodName(), observer.OnNext));
+            return new ObservableHubMessage<T>(_hubProxy, eventToBind.GetMethodName());
         }
 
         #endregion
