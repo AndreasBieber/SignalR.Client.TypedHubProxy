@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Microsoft.AspNet.SignalR.Client
 {
-    public static partial class TypedHubProxyExtensions
+    public static partial class SignalRTypedHubProxyExtensions
     {
         private const string ERR_ACTION_MUST_BE_METHODCALL = "Action must be a method call";
         private const string ERR_CANT_GET_METHODINFO = "Can't get method info of expression.";

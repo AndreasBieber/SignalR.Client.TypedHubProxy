@@ -35,7 +35,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>SignalR.Client.TypedHubProxy.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>SignalR.Client.TypedHubProxy.Tests.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FluentAssertions">
@@ -64,6 +64,9 @@
     </Reference>
     <Reference Include="Microsoft.Owin.Security">
       <HintPath>..\packages\Microsoft.Owin.Security.2.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -96,19 +99,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FixtureBase.cs" />
+    <Compile Include="FixtureTypedHubProxy.cs" />
     <Compile Include="ObservableHubProxyTests.cs" />
     <Compile Include="ObservableHubProxyFixture.cs" />
     <Compile Include="HubConnectionFixture.cs" />
     <Compile Include="Hubs\TestHub.cs" />
     <Compile Include="ITestHub.cs" />
     <Compile Include="ITestHubClientEvents.cs" />
+    <Compile Include="TestExtensions.cs" />
     <Compile Include="TypedHubProxyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypedHubProxyFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="SignalR.Client.TypedHubProxy.snk" />
+    <None Include="SignalR.Client.TypedHubProxy.Tests.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SignalR.Client.TypedHubProxy.Observable\SignalR.Client.TypedHubProxy.Observable.csproj">

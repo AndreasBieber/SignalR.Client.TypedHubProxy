@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.AspNet.SignalR.Client
 {
-    public static partial class TypedHubProxyExtensions
+    public static partial class SignalRTypedHubProxyExtensions
     {
         /// <summary>
         ///     Creates a strongly typed hubproxy.

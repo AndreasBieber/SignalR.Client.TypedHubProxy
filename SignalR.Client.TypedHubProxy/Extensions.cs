@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides several extension methods.
     /// </summary>
-    public static partial class TypedHubProxyExtensions
+    public static partial class SignalRTypedHubProxyExtensions
     {
     }
 }
