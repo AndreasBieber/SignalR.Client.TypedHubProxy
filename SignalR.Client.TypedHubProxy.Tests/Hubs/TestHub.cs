@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
@@ -7,6 +9,13 @@ namespace SignalR.Client.TypedHubProxy.Tests.Hubs
 {
     public class TestHub: Hub<ITestHubClientEvents>, ITestHub
     {
+        public TestHub()
+        {
+            Observable.Timer(TimeSpan.Zero, TimeSpan.FromMilliseconds(10), NewThreadScheduler.Default)
+                .ObserveOn(NewThreadScheduler.Default)
+                .Subscribe(tick => Clients.All.Timer(tick));
+        }
+
         public void ThrowAway(Guid guid)
         {
             
