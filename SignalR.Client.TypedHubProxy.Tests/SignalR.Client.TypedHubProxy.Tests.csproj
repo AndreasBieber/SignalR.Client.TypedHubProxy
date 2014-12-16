@@ -100,13 +100,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FixtureBase.cs" />
+    <Compile Include="FixtureObservableHubProxy.cs" />
     <Compile Include="FixtureTypedHubProxy.cs" />
+    <Compile Include="MockedHubProxy.cs" />
     <Compile Include="ObservableHubProxyTests.cs" />
     <Compile Include="ObservableHubProxyFixture.cs" />
     <Compile Include="HubConnectionFixture.cs" />
-    <Compile Include="Hubs\TestHub.cs" />
     <Compile Include="ITestHub.cs" />
     <Compile Include="ITestHubClientEvents.cs" />
+    <Compile Include="TaskAsyncHelper.cs" />
+    <Compile Include="TestConsts.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="TypedHubProxyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,16 +1,21 @@
 ﻿namespace SignalR.Client.TypedHubProxy.Tests
 {
-    using Microsoft.AspNet.SignalR.Client;
-
+    using Moq;
     internal static class TestExtensions
     {
-        public static void SetupInvoke<T>(this Moq.Mock<Microsoft.AspNet.SignalR.Client.Hubs.HubProxy> mock,
-            System.Linq.Expressions.Expression<System.Action<T>> expression, System.Action callback) where T : class
+        public static Moq.Language.Flow.IReturnsThrows<MockedHubProxy, System.Threading.Tasks.Task> SetupCallback(this Mock<MockedHubProxy> mockedHubProxy,
+            System.Action<object[]> callback)
         {
-            ActionDetail actionDetails = expression.GetActionDetails();
+            return mockedHubProxy.Setup(m => m.Invoke(It.IsAny<string>(), It.IsAny<object[]>()))
+                .Callback<string,object[]>((methodName, args) => callback(args));
+        }
 
-            mock.Setup(m => m.Invoke(actionDetails.MethodName, actionDetails.Parameters))
-                .Callback(callback);
+        public static Moq.Language.Flow.IReturnsThrows<MockedHubProxy, System.Threading.Tasks.Task<TResult>> SetupCallback<TResult>(this Mock<MockedHubProxy> mockedHubProxy,
+            System.Action<object[]> callback)
+        {
+            return mockedHubProxy.Setup(m => m.Invoke<TResult>(It.IsAny<string>(), It.IsAny<object[]>()))
+                .Callback<string, object[]>((methodName, args) => callback(args));
+
         }
     }
 }

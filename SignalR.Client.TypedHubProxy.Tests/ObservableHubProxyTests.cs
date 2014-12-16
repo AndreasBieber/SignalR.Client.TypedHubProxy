@@ -1,43 +1,34 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
 namespace SignalR.Client.TypedHubProxy.Tests
 {
-    public class ObservableHubProxyTests : IUseFixture<ObservableHubProxyFixture>
+    public class ObservableHubProxyTests : IUseFixture<FixtureObservableHubProxy>
     {
-        private ObservableHubProxyFixture _testFixture;
+        private FixtureObservableHubProxy _fixture;
 
-        public void SetFixture(ObservableHubProxyFixture data)
+        public void SetFixture(FixtureObservableHubProxy data)
         {
-            _testFixture = data;
-        }
-
-        [Fact(Timeout = 200, Skip = "Doesn't work on appveyor")]
-        public void ObserveEvent()
-        {
-            var ticks = _testFixture.HubProxy.Observe<long>(hub => hub.Timer);
-            ticks.ToEnumerable().Should().NotBeEmpty();
+            _fixture = data;
         }
 
         [Fact]
-        public async Task ObserveResponseOnRequest()
+        public void TestObserveEvent()
         {
-            Guid id = Guid.NewGuid();
+            const int inParam1 = 1;
+            bool notified = false;
+            IObservable<int> responseId = _fixture.Proxy.Observe<int>(hub => hub.Passing1Param).FirstAsync();
+            
+            responseId.Subscribe(outParam1 =>
+                                 {
+                                     notified = true;
+                                     outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                                 });
 
-            var responseId = _testFixture.HubProxy.Observe<Guid>(hub => hub.DelayedAnswerFromServer).FirstAsync();
-            _testFixture.HubProxy.Call(hub => hub.SendDelayedWithMs(id, 10));
-            (await responseId).Should().Be(id);
-        }
-
-        [Fact]
-        public void ObserveNoResponseWithoutRequest()
-        {
-            var responseId = _testFixture.HubProxy.Observe<Guid>(hub => hub.DelayedAnswerFromServer)
-                .Timeout(TimeSpan.FromMilliseconds(100), Observable.Empty<Guid>());
-            responseId.ToEnumerable().Should().BeEmpty();
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing1Param(inParam1));
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
         }
     }
 }

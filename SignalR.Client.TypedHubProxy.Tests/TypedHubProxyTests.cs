@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
 
@@ -15,213 +14,249 @@ namespace SignalR.Client.TypedHubProxy.Tests
         }
 
         [Fact]
-        public void CallServerSync()
+        public void TestCall()
+        {
+            bool invoked = false;
+
+            _fixture.HubProxyMock
+                .SetupCallback(args => invoked = true)
+                .Returns(TaskAsyncHelper.Empty);
+
+            _fixture.Proxy.Call(hub => hub.DoNothing());
+            invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
+        }
+
+        [Fact]
+        public void TestCallAsync()
+        {
+            bool invoked = false;
+
+            _fixture.HubProxyMock
+                .SetupCallback(args => invoked = true)
+                .Returns(TaskAsyncHelper.Empty);
+
+            _fixture.Proxy.CallAsync(hub => hub.DoNothing());
+            invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
+        }
+
+        [Fact]
+        public void TestCallWithParam()
+        {
+            Guid inParam1 = Guid.NewGuid();
+            Guid outParam1 = Guid.Empty;
+            bool invoked = false;
+
+            _fixture.HubProxyMock
+                .SetupCallback(args =>
+                               {
+                                   invoked = true;
+                                   outParam1 = (Guid) args[0];
+                               })
+                .Returns(TaskAsyncHelper.Empty);
+
+            _fixture.Proxy.Call(hub => hub.DoNothingWithParam(inParam1));
+
+            invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
+            outParam1.Should().Be(inParam1, TestConsts.ERR_PROXY_ROUTE_CORRECTLY);
+        }
+
+        [Fact]
+        public void TestCallWithParamAsync()
+        {
+            Guid inParam1 = Guid.NewGuid();
+            Guid outParam1 = Guid.Empty;
+            bool invoked = false;
+
+            _fixture.HubProxyMock
+                .SetupCallback(args =>
+                               {
+                                   invoked = true;
+                                   outParam1 = (Guid) args[0];
+                               })
+                .Returns(TaskAsyncHelper.Empty);
+
+            _fixture.Proxy.CallAsync(hub => hub.DoNothingWithParam(inParam1));
+
+            invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
+            outParam1.Should().Be(inParam1, TestConsts.ERR_PROXY_ROUTE_CORRECTLY);
+        }
+
+        [Fact]
+        public void TestCallWithResult()
+        {
+            Guid inParam1 = Guid.NewGuid();
+            bool invoked = false;
+
+            _fixture.HubProxyMock
+                .SetupCallback<Guid>(args => invoked = true)
+                .Returns<string,object[]>((methodName, args) => TaskAsyncHelper.FromResult((Guid)args[0]));
+
+            Guid outParam1 = _fixture.Proxy.Call(hub => hub.ReturnGuid(inParam1));
+
+            invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
+            outParam1.Should().Be(inParam1, TestConsts.ERR_PROXY_ROUTE_CORRECTLY);
+        }
+
+        [Fact]
+        public void TestCallWithResultAsync()
+        {
+            Guid inParam1 = Guid.NewGuid();
+            bool invoked = false;
+
+            _fixture.HubProxyMock
+                .SetupCallback<Guid>(args => invoked = true)
+                .Returns<string, object[]>((methodName, args) => TaskAsyncHelper.FromResult((Guid)args[0]));
+
+            Guid outParam1 = _fixture.Proxy.CallAsync(hub => hub.ReturnGuid(inParam1)).Result;
+
+            invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
+            outParam1.Should().Be(inParam1, TestConsts.ERR_PROXY_ROUTE_CORRECTLY);
+        }
+
+
+        [Fact]
+        public void TestSubscribeOnEvent()
         {
             bool notified = false;
-            _fixture.HubProxyMock.SetupInvoke<ITestHub>(m => m.ThrowAway(Guid.NewGuid()), () => notified = true);
-            _fixture.Proxy.Call(hub => hub.ThrowAway(Guid.NewGuid()));
-            notified.Should().BeTrue();
+
+            _fixture.Proxy.SubscribeOn(hub => hub.PassingNoParams, () => notified = true);
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.PassingNoParams());
+
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
         }
 
         [Fact]
-        public void CallServerWithResultSync()
+        public void TestSubscribeOnEventWhereConditionIsFalse()
         {
-            //Guid id = Guid.NewGuid();
+            bool notified = false;
 
-            //Guid response = _proxy.Call(hub => hub.PingBackGuid(id));
-            //response.Should().Be(id, "because the server should return the sent guid");
+            _fixture.Proxy.SubscribeOn<int>(
+                eventToBind: hub => hub.Passing1Param, 
+                wherePredicate: param1 => param1 == 2, 
+                callback: param1 => notified = true);
 
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing1Param(1));
 
-            //_testFixture.HubProxy.Call(hub => hub.PingBackGuid(id))
-            //    .Should()
-            //    .Be(id, "because the server should return the sent guid");
+            notified.Should().BeFalse(TestConsts.ERR_PROXY_RECEIVE_EVENT_WHERE_TRUE);
         }
 
         [Fact]
-        public void CallServerAsync()
+        public void TestSubscribeOnEventWhereConditionIsTrue()
         {
-            //_testFixture.HubProxy.CallAsync(hub => hub.ThrowAway(Guid.NewGuid()));
+            bool notified = false;
+
+            _fixture.Proxy.SubscribeOn<int>(
+                eventToBind: hub => hub.Passing1Param,
+                wherePredicate: param1 => param1 == 1,
+                callback: param1 => notified = true);
+
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing1Param(1));
+
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT_WHERE_TRUE);
         }
 
         [Fact]
-        public void CallServerAsyncWithResult()
+        public void TestSubscribeOnEventsWithAllPossibleParameters()
         {
-            //Guid id = Guid.NewGuid();
-            //_testFixture.HubProxy.CallAsync(hub => hub.PingBackGuid(id))
-            //    .Result
-            //    .Should()
-            //    .Be(id, "because the server should return the sent guid");
-        }
+            const int inParam1 = 1;
+            const int inParam2 = 2;
+            const int inParam3 = 3;
+            const int inParam4 = 4;
+            const int inParam5 = 5;
+            const int inParam6 = 6;
+            const int inParam7 = 7;
 
-        [Fact]
-        public void SubscribeOnEvent()
-        {
-            Guid id = Guid.NewGuid();
+            bool notified = false;
 
-            //_testFixture.HubProxy.SubscribeOn<Guid>(hub => hub.DelayedAnswerFromServer, responseId => responseId.Should().Be(id));
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayedWithMs(id, 10));
-        }
+            // test with 1 parameter
+            _fixture.Proxy.SubscribeOn<int>(hub => hub.Passing1Param, outParam1 =>
+                                                                      {
+                                                                          notified = true;
+                                                                          outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                                                                      });
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing1Param(inParam1));
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
+            notified = false;
 
-        [Fact]
-        public void SubscribeOnEventWithPredicate()
-        {
-            //bool gotResponse = false;
-            //_testFixture.HubProxy.SubscribeOn<Guid>(hub => hub.DelayedAnswerFromServer, param => param == Guid.NewGuid(), param => gotResponse = true);
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayedWithMs(Guid.NewGuid(), 10));
-
-            //Thread.Sleep(100);
-            //gotResponse.Should().BeFalse("because the event should only be fired when the predicate is true.");
-        }
-
-        [Fact]
-        public void TestSubscribeOnEventsWithAllParameters()
-        {
-            //const string assertMessage = "because {0} should be {1}, but was {2}";
-            //const int inParam1 = 1;
-            //const int inParam2 = 2;
-            //const int inParam3 = 3;
-            //const int inParam4 = 4;
-            //const int inParam5 = 5;
-            //const int inParam6 = 6;
-            //const int inParam7 = 7;
-
-            //var responses = new List<AsyncResult>
-            //{
-            //    new AsyncResult(),
-            //    new AsyncResult(),
-            //    new AsyncResult(),
-            //    new AsyncResult(),
-            //    new AsyncResult(),
-            //    new AsyncResult(),
-            //    new AsyncResult(),
-            //    new AsyncResult(),
-            //};
-
-            //// with 0 parameters
-            //_testFixture.HubProxy.SubscribeOn(hub => hub.DelayedAnswer, () => 
-            //    RememberExceptionForAsyncResponse(0, responses, () => { }));
-
-            //// with 1 parameter
-            //_testFixture.HubProxy.SubscribeOn<int>(hub => hub.DelayedAnswer, outParam1 => 
-            //    RememberExceptionForAsyncResponse(1, responses, () =>
-            //        outParam1.Should().Be(inParam1, assertMessage, "outParam1", inParam1, outParam1)));
-
-            //// with 2 parameters
-            //_testFixture.HubProxy.SubscribeOn<int,int>(hub => hub.DelayedAnswer, (outParam1, outParam2) => 
-            //    RememberExceptionForAsyncResponse(2, responses, () =>
-            //    {
-            //        outParam1.Should().Be(inParam1, assertMessage, "outParam1", inParam1, outParam1);
-            //        outParam2.Should().Be(inParam2, assertMessage, "outParam2", inParam2, outParam2);
-            //    }));
-
-            //// with 3 parameters
-            //_testFixture.HubProxy.SubscribeOn<int, int, int>(hub => hub.DelayedAnswer, (outParam1, outParam2, outParam3) => 
-            //    RememberExceptionForAsyncResponse(3, responses, () =>
-            //    {
-            //        outParam1.Should().Be(inParam1, assertMessage, "outParam1", inParam1, outParam1);
-            //        outParam2.Should().Be(inParam2, assertMessage, "outParam2", inParam2, outParam2);
-            //        outParam3.Should().Be(inParam3, assertMessage, "outParam3", inParam2, outParam3);
-            //    }));
-
-            //// with 4 parameters
-            //_testFixture.HubProxy.SubscribeOn<int, int, int, int>(hub => hub.DelayedAnswer, (outParam1, outParam2, outParam3, outParam4) =>
-            //    RememberExceptionForAsyncResponse(4, responses, () =>
-            //    {
-            //        outParam1.Should().Be(inParam1, assertMessage, "outParam1", inParam1, outParam1);
-            //        outParam2.Should().Be(inParam2, assertMessage, "outParam2", inParam2, outParam2);
-            //        outParam3.Should().Be(inParam3, assertMessage, "outParam3", inParam3, outParam3);
-            //        outParam4.Should().Be(inParam4, assertMessage, "outParam4", inParam4, outParam4);
-            //    }));
-
-            //// with 5 parameters
-            //_testFixture.HubProxy.SubscribeOn<int, int, int, int, int>(hub => hub.DelayedAnswer, (outParam1, outParam2, outParam3, outParam4, outParam5) =>
-            //    RememberExceptionForAsyncResponse(5, responses, () =>
-            //    {
-            //        outParam1.Should().Be(inParam1, assertMessage, "outParam1", inParam1, outParam1);
-            //        outParam2.Should().Be(inParam2, assertMessage, "outParam2", inParam2, outParam2);
-            //        outParam3.Should().Be(inParam3, assertMessage, "outParam3", inParam3, outParam3);
-            //        outParam4.Should().Be(inParam4, assertMessage, "outParam4", inParam4, outParam4);
-            //        outParam5.Should().Be(inParam5, assertMessage, "outParam5", inParam5, outParam5);
-            //    }));
-
-            //// with 6 parameters
-            //_testFixture.HubProxy.SubscribeOn<int, int, int, int, int, int>(hub => hub.DelayedAnswer, (outParam1, outParam2, outParam3, outParam4, outParam5, outParam6) =>
-            //    RememberExceptionForAsyncResponse(6, responses, () =>
-            //    {
-            //        outParam1.Should().Be(inParam1, assertMessage, "outParam1", inParam1, outParam1);
-            //        outParam2.Should().Be(inParam2, assertMessage, "outParam2", inParam2, outParam2);
-            //        outParam3.Should().Be(inParam3, assertMessage, "outParam3", inParam3, outParam3);
-            //        outParam4.Should().Be(inParam4, assertMessage, "outParam4", inParam4, outParam4);
-            //        outParam5.Should().Be(inParam5, assertMessage, "outParam5", inParam5, outParam5);
-            //        outParam6.Should().Be(inParam6, assertMessage, "outParam6", inParam6, outParam6);
-            //    }));
-
-            //// with 7 parameters
-            //_testFixture.HubProxy.SubscribeOn<int, int, int, int, int, int, int>(hub => hub.DelayedAnswer, (outParam1, outParam2, outParam3, outParam4, outParam5, outParam6, outParam7) =>
-            //    RememberExceptionForAsyncResponse(7, responses, () =>
-            //    {
-            //        outParam1.Should().Be(inParam1, assertMessage, "outParam1", inParam1, outParam1);
-            //        outParam2.Should().Be(inParam2, assertMessage, "outParam2", inParam2, outParam2);
-            //        outParam3.Should().Be(inParam3, assertMessage, "outParam3", inParam3, outParam3);
-            //        outParam4.Should().Be(inParam4, assertMessage, "outParam4", inParam4, outParam4);
-            //        outParam5.Should().Be(inParam5, assertMessage, "outParam5", inParam5, outParam5);
-            //        outParam6.Should().Be(inParam6, assertMessage, "outParam6", inParam6, outParam6);
-            //        outParam7.Should().Be(inParam7, assertMessage, "outParam7", inParam7, outParam7);
-            //    }));
-
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayed());
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1));
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2));
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3));
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4));
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4, inParam5));
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6));
-            //_testFixture.HubProxy.Call(hub => hub.SendDelayed(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6, inParam7));
-
-            //Task getAllResponsesTask = Task.Factory.StartNew(() =>
-            //{
-            //    while (true)
-            //    {
-            //        if (responses.All(r => r.GotResponse))
-            //        {
-            //            return;
-            //        }
-            //    }
-            //}, TaskCreationOptions.LongRunning);
-
-            //Task.WaitAll(new []{getAllResponsesTask}, TimeSpan.FromSeconds(15))
-            //    .Should()
-            //    .BeTrue("because all responses should be received witin 5 seconds (got {0} responses out of {1})", responses.Count(r => r.GotResponse), responses.Count);
-
-            //AsyncResult erroneousResult = responses.FirstOrDefault(r => r.Exception != null);
-
-            //if (erroneousResult != null)
-            //{
-            //    throw erroneousResult.Exception;
-            //}
-        }
-
-        private void RememberExceptionForAsyncResponse(int responseCount, List<AsyncResult>persistTo,
-            Action action)
-        {
-            try
+            // test with 2 parameter
+            _fixture.Proxy.SubscribeOn<int,int>(hub => hub.Passing2Params, (outParam1, outParam2) =>
             {
-                action();
-            }
-            catch (Exception ex)
+                notified = true;
+                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+            });
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing2Params(inParam1, inParam2));
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
+            notified = false;
+
+            // test with 3 parameter
+            _fixture.Proxy.SubscribeOn<int, int, int>(hub => hub.Passing3Params, (outParam1, outParam2, outParam3) =>
             {
-                persistTo[responseCount].Exception = ex;
-            }
+                notified = true;
+                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+                outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
+            });
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing3Params(inParam1, inParam2, inParam3));
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
+            notified = false;
 
-            persistTo[responseCount].GotResponse = true;
+            // test with 4 parameter
+            _fixture.Proxy.SubscribeOn<int,int, int, int>(hub => hub.Passing4Params, (outParam1, outParam2, outParam3, outParam4) =>
+            {
+                notified = true;
+                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+                outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
+                outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
+            });
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing4Params(inParam1, inParam2, inParam3, inParam4));
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
+            notified = false;
+
+            // test with 5 parameter
+            _fixture.Proxy.SubscribeOn<int,int, int, int, int>(hub => hub.Passing5Params, (outParam1, outParam2, outParam3, outParam4, outParam5) =>
+            {
+                notified = true;
+                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+                outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
+                outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
+                outParam5.Should().Be(inParam5, TestConsts.ERR_PARAM_MISMATCH, "outParam5", inParam5, outParam5);
+            });
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing5Params(inParam1, inParam2, inParam3, inParam4, inParam5));
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
+            notified = false;
+
+            // test with 6 parameter
+            _fixture.Proxy.SubscribeOn<int,int, int, int, int, int>(hub => hub.Passing6Params, (outParam1, outParam2, outParam3, outParam4, outParam5, outParam6) =>
+            {
+                notified = true;
+                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+                outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
+                outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
+                outParam5.Should().Be(inParam5, TestConsts.ERR_PARAM_MISMATCH, "outParam5", inParam5, outParam5);
+                outParam6.Should().Be(inParam6, TestConsts.ERR_PARAM_MISMATCH, "outParam6", inParam6, outParam6);
+            });
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing6Params(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6));
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
+            notified = false;
+
+            // test with 7 parameter
+            _fixture.Proxy.SubscribeOn<int,int, int, int, int, int, int>(hub => hub.Passing7Params, (outParam1, outParam2, outParam3, outParam4, outParam5, outParam6, outParam7) =>
+            {
+                notified = true;
+                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+                outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
+                outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
+                outParam5.Should().Be(inParam5, TestConsts.ERR_PARAM_MISMATCH, "outParam5", inParam5, outParam5);
+                outParam6.Should().Be(inParam6, TestConsts.ERR_PARAM_MISMATCH, "outParam6", inParam6, outParam6);
+                outParam7.Should().Be(inParam7, TestConsts.ERR_PARAM_MISMATCH, "outParam7", inParam7, outParam7);
+            });
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing7Params(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6, inParam7));
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
         }
-
-        private class AsyncResult
-        {
-            public bool GotResponse { get; set; }
-            public Exception Exception { get; set; }
-        }
-
-
     }
 }

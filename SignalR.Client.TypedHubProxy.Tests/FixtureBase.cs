@@ -1,29 +1,32 @@
 ﻿namespace SignalR.Client.TypedHubProxy.Tests
 {
+    using Microsoft.AspNet.SignalR.Client;
+    using Moq;
+    using System.Linq;
+
     public abstract class FixtureBase
     {
-        protected Moq.Mock<Microsoft.AspNet.SignalR.Client.Hubs.IHubConnection> HubConnectionMock;
-        
+        private readonly Microsoft.AspNet.SignalR.Client.Hubs.HubProxy _hubProxy;
+        protected Mock<Microsoft.AspNet.SignalR.Client.Hubs.IHubConnection> HubConnectionMock;
+
 
         protected FixtureBase()
         {
-            HubConnectionMock = new Moq.Mock<Microsoft.AspNet.SignalR.Client.Hubs.IHubConnection>();
+            HubConnectionMock = new Mock<Microsoft.AspNet.SignalR.Client.Hubs.IHubConnection>();
             HubConnectionMock.SetupGet(m => m.JsonSerializer).Returns(new Newtonsoft.Json.JsonSerializer());
 
-            HubProxyMock = new Moq.Mock<Microsoft.AspNet.SignalR.Client.Hubs.HubProxy>(this.HubConnectionMock.Object, "whatEver");
-            //HubProxyMock.Setup(m => m.Invoke(Moq.It.IsAny<string>(), Moq.It.IsAny<object[]>()))
-            //    .Returns(() =>
-            //    {
-            //        var tcs = new System.Threading.Tasks.TaskCompletionSource<object>();
-            //        tcs.SetResult(null);
-
-            //        return tcs.Task;
-            //    });
-            
-
-            //HubProxy = new Microsoft.AspNet.SignalR.Client.Hubs.HubProxy(this.HubConnectionMock.Object, "whatever");
+            _hubProxy = new Microsoft.AspNet.SignalR.Client.Hubs.HubProxy(HubConnectionMock.Object, "whatEver");
+            this.HubProxyMock = new Mock<MockedHubProxy>(_hubProxy);
+            this.HubProxyMock.SetupGet(m => m.JsonSerializer).Returns(_hubProxy.JsonSerializer);
+            this.HubProxyMock.Setup(m => m.Subscribe(It.IsAny<string>())).Returns((string eventName) => _hubProxy.Subscribe(eventName));
+            this.HubProxyMock.Setup(m => m.InvokeEvent(It.IsAny<System.Linq.Expressions.Expression<System.Action<ITestHubClientEvents>>>()))
+                .Callback<System.Linq.Expressions.Expression<System.Action<ITestHubClientEvents>>>(call =>
+                                                                                                   {
+                                                                                                       ActionDetail invocation = call.GetActionDetails();
+                                                                                                       _hubProxy.InvokeEvent(invocation.MethodName, invocation.Parameters.Select(Newtonsoft.Json.Linq.JToken.FromObject).ToList());
+                                                                                                   });
         }
 
-        public Moq.Mock<Microsoft.AspNet.SignalR.Client.Hubs.HubProxy> HubProxyMock { get; protected set; }
+        public Mock<MockedHubProxy> HubProxyMock { get; protected set; }
     }
 }
