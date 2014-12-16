@@ -8,11 +8,11 @@ using Xunit;
 
 namespace SignalR.Client.TypedHubProxy.Tests
 {
-    public class TypedHubProxyTests: IUseFixture<TestFixture>
+    public class TypedHubProxyTests : IUseFixture<TypedHubProxyFixture>
     {
-        private TestFixture _testFixture;
+        private TypedHubProxyFixture _testFixture;
 
-        public void SetFixture(TestFixture data)
+        public void SetFixture(TypedHubProxyFixture data)
         {
             _testFixture = data;
         }
