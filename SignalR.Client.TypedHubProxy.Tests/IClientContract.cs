@@ -2,7 +2,7 @@
 
 namespace SignalR.Client.TypedHubProxy.Tests
 {
-    public interface ITestHubClientEvents
+    public interface IClientContract
     {
         void DelayedAnswerFromServer(Guid guid);
 

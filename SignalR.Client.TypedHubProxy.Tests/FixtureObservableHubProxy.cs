@@ -6,9 +6,9 @@
     {
         public FixtureObservableHubProxy()
         {
-            this.Proxy = HubProxyMock.Object.CreateObservableProxy<ITestHub, ITestHubClientEvents>();
+            this.Proxy = HubProxyMock.Object.CreateObservableProxy<IServerContract, IClientContract>();
         }
 
-        public IObservableHubProxy<ITestHub, ITestHubClientEvents> Proxy { get; private set; }
+        public IObservableHubProxy<IServerContract, IClientContract> Proxy { get; private set; }
     }
 }

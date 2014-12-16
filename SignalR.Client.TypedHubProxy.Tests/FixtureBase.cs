@@ -19,8 +19,8 @@
             this.HubProxyMock = new Mock<MockedHubProxy>(_hubProxy);
             this.HubProxyMock.SetupGet(m => m.JsonSerializer).Returns(_hubProxy.JsonSerializer);
             this.HubProxyMock.Setup(m => m.Subscribe(It.IsAny<string>())).Returns((string eventName) => _hubProxy.Subscribe(eventName));
-            this.HubProxyMock.Setup(m => m.InvokeEvent(It.IsAny<System.Linq.Expressions.Expression<System.Action<ITestHubClientEvents>>>()))
-                .Callback<System.Linq.Expressions.Expression<System.Action<ITestHubClientEvents>>>(call =>
+            this.HubProxyMock.Setup(m => m.InvokeEvent(It.IsAny<System.Linq.Expressions.Expression<System.Action<IClientContract>>>()))
+                .Callback<System.Linq.Expressions.Expression<System.Action<IClientContract>>>(call =>
                                                                                                    {
                                                                                                        ActionDetail invocation = call.GetActionDetails();
                                                                                                        _hubProxy.InvokeEvent(invocation.MethodName, invocation.Parameters.Select(Newtonsoft.Json.Linq.JToken.FromObject).ToList());

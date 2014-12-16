@@ -38,7 +38,7 @@ namespace SignalR.Client.TypedHubProxy.Tests
             return _hubProxy.Subscribe(eventName);
         }
 
-        public virtual void InvokeEvent(System.Linq.Expressions.Expression<System.Action<ITestHubClientEvents>> call)
+        public virtual void InvokeEvent(System.Linq.Expressions.Expression<System.Action<IClientContract>> call)
         {
             ActionDetail invocation = call.GetActionDetails();
 

@@ -2,7 +2,7 @@
 
 namespace SignalR.Client.TypedHubProxy.Tests
 {
-    public interface ITestHub
+    public interface IServerContract
     {
         /// <summary>
         /// Does nothing.
