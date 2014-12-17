@@ -6,7 +6,7 @@
     {
         public TypedHubProxyFixture()
         {
-            this.Proxy = HubProxyMock.Object.CreateHubProxy<Contracts.IServerContract, Contracts.IClientContract>();
+            this.Proxy = HubProxyMock.Object.AsHubProxy<Contracts.IServerContract, Contracts.IClientContract>();
         }
 
         public IHubProxy<Contracts.IServerContract, Contracts.IClientContract> Proxy { get; private set; }
