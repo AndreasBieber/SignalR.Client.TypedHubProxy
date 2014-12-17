@@ -1,14 +1,15 @@
-﻿using System;
-using FluentAssertions;
-using Xunit;
-
-namespace SignalR.Client.TypedHubProxy.Tests
+﻿namespace SignalR.Client.TypedHubProxy.Tests
 {
-    public class TypedHubProxyTests : IUseFixture<FixtureTypedHubProxy>
-    {
-        private FixtureTypedHubProxy _fixture;
+    using System;
+    using FluentAssertions;
+    using Xunit;
+    using Utils;
 
-        public void SetFixture(FixtureTypedHubProxy data)
+    public class TypedHubProxyTests : IUseFixture<TestFixtures.TypedHubProxyFixture>
+    {
+        private TestFixtures.TypedHubProxyFixture _fixture;
+
+        public void SetFixture(TestFixtures.TypedHubProxyFixture data)
         {
             _fixture = data;
         }
@@ -18,8 +19,7 @@ namespace SignalR.Client.TypedHubProxy.Tests
         {
             bool invoked = false;
 
-            _fixture.HubProxyMock
-                .SetupCallback(args => invoked = true)
+            _fixture.HubProxyMock.SetupCallback(args => invoked = true)
                 .Returns(TaskAsyncHelper.Empty);
 
             _fixture.Proxy.Call(hub => hub.DoNothing());
@@ -31,8 +31,7 @@ namespace SignalR.Client.TypedHubProxy.Tests
         {
             bool invoked = false;
 
-            _fixture.HubProxyMock
-                .SetupCallback(args => invoked = true)
+            _fixture.HubProxyMock.SetupCallback(args => invoked = true)
                 .Returns(TaskAsyncHelper.Empty);
 
             _fixture.Proxy.CallAsync(hub => hub.DoNothing());
@@ -46,13 +45,12 @@ namespace SignalR.Client.TypedHubProxy.Tests
             Guid outParam1 = Guid.Empty;
             bool invoked = false;
 
-            _fixture.HubProxyMock
-                .SetupCallback(args =>
-                               {
-                                   invoked = true;
-                                   outParam1 = (Guid) args[0];
-                               })
-                .Returns(TaskAsyncHelper.Empty);
+            _fixture.HubProxyMock.SetupCallback(args =>
+            {
+                invoked = true;
+                outParam1 = (Guid) args[0];
+            })
+            .Returns(TaskAsyncHelper.Empty);
 
             _fixture.Proxy.Call(hub => hub.DoNothingWithParam(inParam1));
 
@@ -67,13 +65,12 @@ namespace SignalR.Client.TypedHubProxy.Tests
             Guid outParam1 = Guid.Empty;
             bool invoked = false;
 
-            _fixture.HubProxyMock
-                .SetupCallback(args =>
-                               {
-                                   invoked = true;
-                                   outParam1 = (Guid) args[0];
-                               })
-                .Returns(TaskAsyncHelper.Empty);
+            _fixture.HubProxyMock.SetupCallback(args =>
+            {
+                invoked = true;
+                outParam1 = (Guid) args[0];
+            })
+            .Returns(TaskAsyncHelper.Empty);
 
             _fixture.Proxy.CallAsync(hub => hub.DoNothingWithParam(inParam1));
 
@@ -87,8 +84,7 @@ namespace SignalR.Client.TypedHubProxy.Tests
             Guid inParam1 = Guid.NewGuid();
             bool invoked = false;
 
-            _fixture.HubProxyMock
-                .SetupCallback<Guid>(args => invoked = true)
+            _fixture.HubProxyMock.SetupCallback<Guid>(args => invoked = true)
                 .Returns<string,object[]>((methodName, args) => TaskAsyncHelper.FromResult((Guid)args[0]));
 
             Guid outParam1 = _fixture.Proxy.Call(hub => hub.ReturnGuid(inParam1));
@@ -103,8 +99,7 @@ namespace SignalR.Client.TypedHubProxy.Tests
             Guid inParam1 = Guid.NewGuid();
             bool invoked = false;
 
-            _fixture.HubProxyMock
-                .SetupCallback<Guid>(args => invoked = true)
+            _fixture.HubProxyMock.SetupCallback<Guid>(args => invoked = true)
                 .Returns<string, object[]>((methodName, args) => TaskAsyncHelper.FromResult((Guid)args[0]));
 
             Guid outParam1 = _fixture.Proxy.CallAsync(hub => hub.ReturnGuid(inParam1)).Result;

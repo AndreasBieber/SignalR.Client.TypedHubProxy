@@ -1,15 +1,15 @@
-﻿using System;
-using System.Reactive.Linq;
-using FluentAssertions;
-using Xunit;
-
-namespace SignalR.Client.TypedHubProxy.Tests
+﻿namespace SignalR.Client.TypedHubProxy.Tests
 {
-    public class ObservableHubProxyTests : IUseFixture<FixtureObservableHubProxy>
-    {
-        private FixtureObservableHubProxy _fixture;
+    using System;
+    using System.Reactive.Linq;
+    using FluentAssertions;
+    using Xunit;
 
-        public void SetFixture(FixtureObservableHubProxy data)
+    public class ObservableHubProxyFacts : IUseFixture<TestFixtures.ObservableHubProxyFixture>
+    {
+        private TestFixtures.ObservableHubProxyFixture _fixture;
+
+        public void SetFixture(TestFixtures.ObservableHubProxyFixture data)
         {
             _fixture = data;
         }
@@ -24,11 +24,11 @@ namespace SignalR.Client.TypedHubProxy.Tests
             responseId.Subscribe(outParam1 =>
                                  {
                                      notified = true;
-                                     outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                                     outParam1.Should().Be(inParam1, Utils.TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
                                  });
 
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing1Param(inParam1));
-            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
+            notified.Should().BeTrue(Utils.TestConsts.ERR_PROXY_RECEIVE_EVENT);
         }
     }
 }

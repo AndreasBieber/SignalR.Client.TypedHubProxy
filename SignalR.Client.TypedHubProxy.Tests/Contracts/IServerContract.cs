@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace SignalR.Client.TypedHubProxy.Tests
+﻿namespace SignalR.Client.TypedHubProxy.Tests.Contracts
 {
+    using System;
+
     public interface IServerContract
     {
         /// <summary>

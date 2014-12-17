@@ -1,4 +1,4 @@
-﻿namespace SignalR.Client.TypedHubProxy.Tests
+﻿namespace SignalR.Client.TypedHubProxy.Tests.Utils
 {
     internal static class TaskAsyncHelper
     {

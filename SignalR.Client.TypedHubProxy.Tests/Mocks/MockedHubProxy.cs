@@ -1,9 +1,8 @@
-﻿
-using System.Linq;
-
-namespace SignalR.Client.TypedHubProxy.Tests
+﻿namespace SignalR.Client.TypedHubProxy.Tests.Mocks
 {
+    using System.Linq;
     using Microsoft.AspNet.SignalR.Client;
+
     public class MockedHubProxy : IHubProxy
     {
         private readonly Microsoft.AspNet.SignalR.Client.Hubs.HubProxy _hubProxy;
@@ -38,7 +37,7 @@ namespace SignalR.Client.TypedHubProxy.Tests
             return _hubProxy.Subscribe(eventName);
         }
 
-        public virtual void InvokeEvent(System.Linq.Expressions.Expression<System.Action<IClientContract>> call)
+        public virtual void InvokeEvent(System.Linq.Expressions.Expression<System.Action<Contracts.IClientContract>> call)
         {
             ActionDetail invocation = call.GetActionDetails();
 

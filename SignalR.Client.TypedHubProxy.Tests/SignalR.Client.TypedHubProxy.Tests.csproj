@@ -99,16 +99,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FixtureBase.cs" />
-    <Compile Include="FixtureObservableHubProxy.cs" />
-    <Compile Include="FixtureTypedHubProxy.cs" />
-    <Compile Include="MockedHubProxy.cs" />
+    <Compile Include="TestFixtures\BaseFixture.cs" />
+    <Compile Include="TestFixtures\ObservableHubProxyFixture.cs" />
+    <Compile Include="TestFixtures\TypedHubProxyFixture.cs" />
+    <Compile Include="Mocks\MockedHubProxy.cs" />
     <Compile Include="ObservableHubProxyFacts.cs" />
-    <Compile Include="IServerContract.cs" />
-    <Compile Include="IClientContract.cs" />
-    <Compile Include="TaskAsyncHelper.cs" />
-    <Compile Include="TestConsts.cs" />
-    <Compile Include="TestExtensions.cs" />
+    <Compile Include="Contracts\IServerContract.cs" />
+    <Compile Include="Contracts\IClientContract.cs" />
+    <Compile Include="Utils\TaskAsyncHelper.cs" />
+    <Compile Include="Utils\TestConsts.cs" />
+    <Compile Include="Utils\TestExtensions.cs" />
     <Compile Include="TypedHubProxyFacts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
