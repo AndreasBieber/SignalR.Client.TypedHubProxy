@@ -1,11 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-
-namespace Microsoft.AspNet.SignalR.Client
+﻿namespace Microsoft.AspNet.SignalR.Client
 {
-    public static partial class SignalRTypedHubProxyExtensions
+    using System;
+    using System.Linq;
+    using System.Linq.Expressions;
+
+    internal static class ExtensionsInternal
     {
         private const string ERR_ACTION_MUST_BE_METHODCALL = "Action must be a method call";
         private const string ERR_CANT_GET_METHODINFO = "Can't get method info of expression.";
@@ -57,7 +56,7 @@ namespace Microsoft.AspNet.SignalR.Client
                 throw new Exception(ERR_CANT_GET_METHODINFO);
             }
 
-            var methodInfo = (MethodInfo)((ConstantExpression)methodCallExpression.Object).Value;
+            var methodInfo = (System.Reflection.MethodInfo)((ConstantExpression)methodCallExpression.Object).Value;
 
             return methodInfo.Name;
         }

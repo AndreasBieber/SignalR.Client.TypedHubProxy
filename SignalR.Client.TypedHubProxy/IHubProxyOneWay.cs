@@ -8,7 +8,7 @@ namespace Microsoft.AspNet.SignalR.Client
     ///     ITypedHubProxy.
     /// </summary>
     /// <typeparam name="TServerHubInterface">Interface of the server hub.</typeparam>
-    public interface ITypedHubOneWayProxy<TServerHubInterface>
+    public interface IHubProxyOneWay<TServerHubInterface>
         where TServerHubInterface : class
     {
         /// <summary>

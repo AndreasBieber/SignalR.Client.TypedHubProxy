@@ -1,114 +1,165 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using Microsoft.AspNet.SignalR.Client.Hubs;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace Microsoft.AspNet.SignalR.Client
+﻿namespace Microsoft.AspNet.SignalR.Client
 {
+    using System;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
     /// <summary>
-    ///     Proxy for SignalR.
+    /// Typed HubProxy for SignalR.
     /// </summary>
     /// <typeparam name="TServerHubInterface">The interface of the server hub.</typeparam>
     /// <typeparam name="TClientInterface">The interface of the client events.</typeparam>
-    public class TypedHubProxy<TServerHubInterface, TClientInterface> :
-        TypedHubOneWayProxy<TServerHubInterface>, ITypedHubProxy<TServerHubInterface, TClientInterface>
+    public class HubProxy<TServerHubInterface, TClientInterface> : IHubProxy<TServerHubInterface, TClientInterface>,
+        IObservableHubProxy<TServerHubInterface, TClientInterface>
         where TServerHubInterface : class
         where TClientInterface : class
     {
-        private readonly MethodInfo _convertStub =
-            typeof (TypedHubProxy<TServerHubInterface, TClientInterface>).GetMethod("Convert",
-                BindingFlags.NonPublic | BindingFlags.Static);
+        private const string ERR_NOT_AN_INTERFACE = "\"{0}\" is not an interface.";
 
-        private readonly Dictionary<Subscription, Action<IList<JToken>>> _subscriptions =
-            new Dictionary<Subscription, Action<IList<JToken>>>();
+        private readonly IHubProxy _hubProxy;
+        private readonly System.Reflection.MethodInfo _convertStub =
+            typeof(HubProxy<TServerHubInterface, TClientInterface>).GetMethod("Convert",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
-        internal TypedHubProxy(IHubProxy hubProxy) : base(hubProxy)
+        private readonly Dictionary<Hubs.Subscription, Action<IList<Newtonsoft.Json.Linq.JToken>>> _subscriptions =
+            new Dictionary<Hubs.Subscription, Action<IList<Newtonsoft.Json.Linq.JToken>>>();
+
+        internal HubProxy(IHubProxy hubProxy)
         {
-        }
-
-        internal TypedHubProxy(HubConnection hubConnection, string hubName) : base(hubConnection, hubName)
-        {
-            if (!typeof (TClientInterface).IsInterface)
+            if (!typeof(TServerHubInterface).IsInterface)
             {
-                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof (TClientInterface).Name));
+                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof(TServerHubInterface).Name));
             }
+
+            if (!typeof(TClientInterface).IsInterface)
+            {
+                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof(TClientInterface).Name));
+            }
+
+
+            _hubProxy = hubProxy;
         }
 
-        #region ITypedHubProxy implementations
+        internal HubProxy(HubConnection hubConnection, string hubName)
+            : this(hubConnection.CreateHubProxy(hubName))
+        {
+        }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn(
+        #region ITypedHubOneWayProxy implementations
+
+        void IHubProxyOneWay<TServerHubInterface>.Call(Expression<Action<TServerHubInterface>> call)
+        {
+            ((IHubProxyOneWay<TServerHubInterface>)this).CallAsync(call).Wait();
+        }
+
+        TResult IHubProxyOneWay<TServerHubInterface>.Call<TResult>(
+            Expression<Func<TServerHubInterface, TResult>> call)
+        {
+            return ((IHubProxyOneWay<TServerHubInterface>)this).CallAsync(call).Result;
+        }
+
+        Task IHubProxyOneWay<TServerHubInterface>.CallAsync(
+            Expression<Action<TServerHubInterface>> call)
+        {
+            ActionDetail invocation = call.GetActionDetails();
+            return _hubProxy.Invoke(invocation.MethodName, invocation.Parameters);
+        }
+
+        Task IHubProxyOneWay<TServerHubInterface>.CallAsync(
+            Expression<Func<TServerHubInterface, Task>> call)
+        {
+            ActionDetail invocation = call.GetActionDetails();
+            return _hubProxy.Invoke(invocation.MethodName, invocation.Parameters);
+        }
+
+        Task<TResult> IHubProxyOneWay<TServerHubInterface>.CallAsync<TResult>(
+            Expression<Func<TServerHubInterface, TResult>> call)
+        {
+            ActionDetail invocation = call.GetActionDetails();
+            return _hubProxy.Invoke<TResult>(invocation.MethodName, invocation.Parameters);
+        }
+
+        Task<TResult> IHubProxyOneWay<TServerHubInterface>.CallAsync<TResult>(
+            Expression<Func<TServerHubInterface, Task<TResult>>> call)
+        {
+            ActionDetail invocation = call.GetActionDetails();
+            return _hubProxy.Invoke<TResult>(invocation.MethodName, invocation.Parameters);
+        }
+
+        #endregion
+
+        #region IHubProxy implementations
+
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn(
             Expression<Func<TClientInterface, Action>> eventToBind, Action callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
             Expression<Func<TClientInterface, Action<T>>> eventToBind, Action<T> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
             Expression<Func<TClientInterface, Action<T>>> eventToBind, Func<T, bool> wherePredicate, Action<T> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
             Expression<Func<TClientInterface, Action<T1, T2>>> eventToBind,
             Action<T1, T2> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
             Expression<Func<TClientInterface, Action<T1, T2>>> eventToBind, Func<T1, T2, bool> wherePredicate,
             Action<T1, T2> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
             Expression<Func<TClientInterface, Action<T1, T2, T3>>> eventToBind,
             Action<T1, T2, T3> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
             Expression<Func<TClientInterface, Action<T1, T2, T3>>> eventToBind, Func<T1, T2, T3, bool> wherePredicate,
             Action<T1, T2, T3> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4>>> eventToBind,
             Action<T1, T2, T3, T4> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4>>> eventToBind,
             Func<T1, T2, T3, T4, bool> wherePredicate, Action<T1, T2, T3, T4> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5>>> eventToBind,
             Action<T1, T2, T3, T4, T5> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5>>> eventToBind,
             Func<T1, T2, T3, T4, T5, bool> wherePredicate,
             Action<T1, T2, T3, T4, T5> callback)
@@ -116,14 +167,14 @@ namespace Microsoft.AspNet.SignalR.Client
             CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6>>> eventToBind,
             Action<T1, T2, T3, T4, T5, T6> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6>>> eventToBind,
             Func<T1, T2, T3, T4, T5, T6, bool> wherePredicate,
             Action<T1, T2, T3, T4, T5, T6> callback)
@@ -131,14 +182,14 @@ namespace Microsoft.AspNet.SignalR.Client
             CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6, T7>>> eventToBind,
             Action<T1, T2, T3, T4, T5, T6, T7> callback)
         {
             CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6, T7>>> eventToBind,
             Func<T1, T2, T3, T4, T5, T6, T7, bool> wherePredicate,
             Action<T1, T2, T3, T4, T5, T6, T7> callback)
@@ -146,7 +197,7 @@ namespace Microsoft.AspNet.SignalR.Client
             CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void ITypedHubProxy<TServerHubInterface, TClientInterface>.SubscribeOnAll(object instance)
+        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOnAll(object instance)
         {
             if (instance == null)
             {
@@ -155,22 +206,22 @@ namespace Microsoft.AspNet.SignalR.Client
 
             if (!(instance is TClientInterface))
             {
-                throw new ConstraintException(string.Format("{0} doesn't implements the interface {1}.",
-                    instance.GetType().Name, typeof (TClientInterface).Name));
+                throw new System.Data.ConstraintException(string.Format("{0} doesn't implements the interface {1}.",
+                    instance.GetType().Name, typeof(TClientInterface).Name));
             }
 
-            MethodInfo[] methodInfos = typeof (TClientInterface).GetMethods();
+            System.Reflection.MethodInfo[] methodInfos = typeof(TClientInterface).GetMethods();
 
-            foreach (MethodInfo methodInfo in methodInfos)
+            foreach (System.Reflection.MethodInfo methodInfo in methodInfos)
             {
-                ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+                System.Reflection.ParameterInfo[] parameterInfos = methodInfo.GetParameters();
 
                 if (parameterInfos.Count() > 7)
                 {
                     throw new NotSupportedException(
                         string.Format(
                             "Only interface methods with less or equal 7 parameters are supported: {0}.{1}({2})!",
-                            // ReSharper disable once PossibleNullReferenceException
+                        // ReSharper disable once PossibleNullReferenceException
                             methodInfo.DeclaringType.FullName.Replace("+", "."),
                             methodInfo.Name,
                             string.Join(", ",
@@ -183,12 +234,12 @@ namespace Microsoft.AspNet.SignalR.Client
                 if (parameterInfos.Any())
                 {
                     actionType = parameterInfos.Length > 1
-                        ? typeof (Action<,>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray())
-                        : typeof (Action<>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray());
+                        ? typeof(Action<,>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray())
+                        : typeof(Action<>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray());
                 }
                 else
                 {
-                    actionType = typeof (Action);
+                    actionType = typeof(Action);
                 }
 
                 Delegate actionDelegate = Delegate.CreateDelegate(actionType, instance, methodInfo);
@@ -199,6 +250,18 @@ namespace Microsoft.AspNet.SignalR.Client
         }
 
         #endregion
+
+        #region IObservableHubProxy implementations
+
+        IObservable<T> IObservableHubProxy<TServerHubInterface, TClientInterface>.Observe<T>(
+            Expression<Func<TClientInterface, Action<T>>> eventToBind)
+        {
+            return new ObservableHubMessage<T>(_hubProxy, eventToBind.GetMethodName());
+        }
+
+        #endregion
+
+        #region IDisposable implementation
 
         /// <summary>
         ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -214,6 +277,8 @@ namespace Microsoft.AspNet.SignalR.Client
             _subscriptions.Clear();
         }
 
+        #endregion
+
         /// <summary>
         ///     Deserialization of incoming data object.
         /// </summary>
@@ -221,7 +286,7 @@ namespace Microsoft.AspNet.SignalR.Client
         /// <param name="serializer"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        protected static T Convert<T>(JToken obj, JsonSerializer serializer)
+        protected static T Convert<T>(Newtonsoft.Json.Linq.JToken obj, Newtonsoft.Json.JsonSerializer serializer)
         {
             if (obj == null)
             {
@@ -233,11 +298,11 @@ namespace Microsoft.AspNet.SignalR.Client
 
         private void CreateSubscription(string eventName, Delegate callback, Delegate wherePredicate = null)
         {
-            Subscription subscription = _hubProxy.Subscribe(eventName);
+            Hubs.Subscription subscription = _hubProxy.Subscribe(eventName);
 
             Type[] genericArguments = callback.GetType().GetGenericArguments();
 
-            Action<IList<JToken>> handler = args =>
+            Action<IList<Newtonsoft.Json.Linq.JToken>> handler = args =>
             {
                 if (genericArguments.Length == 0)
                 {
@@ -249,12 +314,12 @@ namespace Microsoft.AspNet.SignalR.Client
                         .Select(t => _convertStub.MakeGenericMethod(t))
                         .Select(
                             (convertMethod, i) =>
-                                convertMethod.Invoke(null, new object[] {args[i], _hubProxy.JsonSerializer}))
+                                convertMethod.Invoke(null, new object[] { args[i], _hubProxy.JsonSerializer }))
                         .ToArray();
 
                     if (wherePredicate != null)
                     {
-                        if ((bool) wherePredicate.DynamicInvoke(genericArgs))
+                        if ((bool)wherePredicate.DynamicInvoke(genericArgs))
                         {
                             callback.DynamicInvoke(genericArgs);
                         }

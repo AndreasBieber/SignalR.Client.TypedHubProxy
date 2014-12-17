@@ -1,14 +1,14 @@
-﻿using System;
-using System.Linq.Expressions;
-
-namespace Microsoft.AspNet.SignalR.Client
+﻿namespace Microsoft.AspNet.SignalR.Client
 {
+    using System;
+    using System.Linq.Expressions;
+
     /// <summary>
-    ///     IObservableHubProxy.
+    ///     Observable HubProxy.
     /// </summary>
     /// <typeparam name="TServerHubInterface">Interface of the server hub.</typeparam>
     /// <typeparam name="TClientInterface">Interface which contains the client events.</typeparam>
-    public interface IObservableHubProxy<TServerHubInterface, TClientInterface> : ITypedHubOneWayProxy<TServerHubInterface>
+    public interface IObservableHubProxy<TServerHubInterface, TClientInterface> : IHubProxyOneWay<TServerHubInterface>
         where TServerHubInterface : class
         where TClientInterface : class
     {

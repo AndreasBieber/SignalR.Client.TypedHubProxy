@@ -6,7 +6,7 @@
     {
         public ObservableHubProxyFixture()
         {
-            this.Proxy = HubProxyMock.Object.CreateObservableProxy<Contracts.IServerContract, Contracts.IClientContract>();
+            this.Proxy = HubProxyMock.Object.CreateObservableHubProxy<Contracts.IServerContract, Contracts.IClientContract>();
         }
 
         public IObservableHubProxy<Contracts.IServerContract, Contracts.IClientContract> Proxy { get; private set; }
