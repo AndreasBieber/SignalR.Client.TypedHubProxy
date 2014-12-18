@@ -68,7 +68,7 @@ To understand exactly what the TypedHubProxy does, here an example of how it is 
 Microsoft.AspNet.SignalR.Client.IHubProxy hubProxy = hubConnection.CreateHubProxy("serverHub");
 hubProxy.Invoke("DoSomething", new object[0]);
 ```
-What really bugged me out, was the lack of strongly typed invocation.
+What really bugged me out was the lack of strongly typed invocation.
 So SignalR.Client.TypedHubProxy enables strongly typed invocation and much more. The following code sample shows you exactly what can it be used for:
 ```csharp
 IHubProxy<IServerHub, IClientContract> hubProxy = hubConnection.CreateHubProxy<IServerHub, IClientContract>("serverHub");
