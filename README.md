@@ -22,6 +22,7 @@ public interface IServerHub
 {
     void DoSomething();
     void DoSomethingWithParam(int id);
+    System.Threading.Tasks.Task DoSomethingAsync();
     int DoSomethingWithParamAndResult(int id);
 }
 
@@ -29,6 +30,7 @@ public interface IClientContract
 {
     void SomeInformation();
     void SomeInformationWithParam(int id);
+    void SomeInformationWithText(string text);
 }
 ```
 
@@ -47,6 +49,12 @@ public class ServerHub : Microsoft.AspNet.SignalR.Hub<IClientContract>, IServerH
         System.Console.WriteLine("DoSomethingWithParam called.");
     }
 
+    public System.Threading.Tasks.Task DoSomethingAsync()
+    {
+        return System.Threading.Tasks.Task.Run(
+            () => System.Console.WriteLine("DoSomethingAsync called."));
+    }
+
     public int DoSomethingWithParamAndResult(int id)
     {
         System.Console.WriteLine("DoSomethingWithParamAndResult called.");
@@ -62,7 +70,7 @@ var hubConnection = new Microsoft.AspNet.SignalR.Client.HubConnection("http://lo
 ### Invocations
 
 The next part is the interesting one - The usage of the strongly typed HubProxy.
-To understand exactly what the TypedHubProxy does, here an example of how it is used normally:
+To understand exactly what the TypedHubProxy and ObservableHubProxy do, here an example of how it is used normally:
 
 ```csharp
 Microsoft.AspNet.SignalR.Client.IHubProxy hubProxy = hubConnection.CreateHubProxy("serverHub");
@@ -84,10 +92,16 @@ int result = hubProxy.Call<int>(hub => hub.DoSomethingWithParamAndResult(5));
 ```
 Async calls are also possible:
 ```csharp
-hubProxy.CallAsync(hub => hub.DoSomething());
-hubProxy.CallAsync(hub => hub.DoSomethingWithParam(5));
-System.Threading.Tasks.Task<int> asyncResult = hubProxy.CallAsync(hub => hub.DoSomethingWithParamAndResult(5));
-int result = asyncResult.Result; // or just: int result = hubProxy.CallAsync(hub => hub.DoSomethingWithParamAndResult(5)).Result;
+await hubProxy.CallAsync(hub => hub.DoSomething());
+await hubProxy.CallAsync(hub => hub.DoSomethingWithParam(5));
+await hubProxy.CallAsync(hub => hub.DoSomethingAsync());
+int asyncResult = await hubProxy.CallAsync(hub => hub.DoSomethingWithParamAndResult(5));
+```
+
+Invocations on IObservableHubProxy work exactly the same way. The only difference is how
+to create that type of proxy:
+```csharp
+IObservableHubProxy<IServerHub, IClientContract> hubProxy = hubConnection.CreateObservableHubProxy<IServerHub, IClientContract>("serverHub");
 ```
 
 ### Subscriptions
@@ -110,7 +124,19 @@ IHubProxy<IServerHub, IClientContract> hubProxy = hubConnection.CreateHubProxy<I
 hubProxy.SubscribeOn<int>(hub => hub.SomeInformationWithParam, i => i == 5, i => System.Console.WriteLine("Got new information where data == 5"));
 ```
 
-### Observable
+With IObservableHubProxy you can treat your subscriptions as IObservable<T>
+(in other words you can treat them as streams of data that is pushed to you).
+It means that you can do with them anything that
+[Reactive Extensions](https://rx.codeplex.com/) provide for you.
 ```csharp
-System.IObservable<int> observableResult = hubProxy.Observe<int>(hub => hub.SomeInformationWithParam);
+IObservableHubProxy<IServerHub, IClientContract> hubProxy =
+    hubConnection.CreateObservableHubProxy<IServerHub, IClientContract>("serverHub");
+IObservable<int> ids = hubProxy.Observe<int>(hub => hub.SomeInformationWithParam);
+IObservable<string> texts = hubProxy.Observe<string>(hub => hub.SomeInformationWithText);
+IDisposable subscription = ids.Where(i => i >= 5)
+    .CombineLatest(texts.Where(text => !String.IsNullOrEmpty(text)), (id, text) => new { id, text })
+    .Subscribe(x => System.Console.WriteLine("Latest id = {0} and text = {1}", x.id, x.text));
+...
+// Unsubscribe
+subscription.Dispose();
 ```
