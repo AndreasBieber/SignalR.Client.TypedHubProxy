@@ -26,7 +26,12 @@
         private readonly Dictionary<Hubs.Subscription, Action<IList<Newtonsoft.Json.Linq.JToken>>> _subscriptions =
             new Dictionary<Hubs.Subscription, Action<IList<Newtonsoft.Json.Linq.JToken>>>();
 
-        internal HubProxy(IHubProxy hubProxy)
+        /// <summary>
+        /// Ctor of HubProxy.
+        /// </summary>
+        /// <param name="hubProxy">IHubProxy.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public HubProxy(IHubProxy hubProxy)
         {
             if (!typeof(TServerHubInterface).IsInterface)
             {
@@ -42,7 +47,12 @@
             _hubProxy = hubProxy;
         }
 
-        internal HubProxy(HubConnection hubConnection, string hubName)
+        /// <summary>
+        /// Ctor of HubProxy.
+        /// </summary>
+        /// <param name="hubConnection">HubConnection.</param>
+        /// <param name="hubName">Name of the hub.</param>
+        public HubProxy(HubConnection hubConnection, string hubName)
             : this(hubConnection.CreateHubProxy(hubName))
         {
         }
