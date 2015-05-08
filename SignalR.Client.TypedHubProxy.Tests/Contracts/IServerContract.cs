@@ -1,4 +1,6 @@
-﻿namespace SignalR.Client.TypedHubProxy.Tests.Contracts
+﻿using System.Threading.Tasks;
+
+namespace SignalR.Client.TypedHubProxy.Tests.Contracts
 {
     using System;
 
@@ -20,5 +22,11 @@
         /// </summary>
         /// <param name="guid">Guid.</param>
         Guid ReturnGuid(Guid guid);
+
+        /// <summary>
+        /// Async operation.
+        /// </summary>
+        /// <returns></returns>
+        Task ReturnTask();
     }
 }
