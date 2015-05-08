@@ -1,10 +1,14 @@
-﻿namespace SignalR.Client.TypedHubProxy.Tests.Contracts
+﻿using System.Threading.Tasks;
+
+namespace SignalR.Client.TypedHubProxy.Tests.Contracts
 {
     using System;
 
     public interface IClientContract
     {
         void DelayedAnswerFromServer(Guid guid);
+
+        Task ReturningTask();
 
         void PassingNoParams();
         void Passing1Param(int param1);

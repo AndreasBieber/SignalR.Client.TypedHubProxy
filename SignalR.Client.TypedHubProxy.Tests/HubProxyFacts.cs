@@ -121,6 +121,17 @@
         }
 
         [Fact]
+        public void TestSubscribeOnAsyncEvent()
+        {
+            bool notified = false;
+
+            _fixture.Proxy.SubscribeOn(hub => hub.ReturningTask, () => notified = true);
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.ReturningTask());
+
+            notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
+        }
+
+        [Fact]
         public void TestSubscribeOnEventWhereConditionIsFalse()
         {
             bool notified = false;

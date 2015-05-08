@@ -1,4 +1,6 @@
-﻿namespace Microsoft.AspNet.SignalR.Client
+﻿using System.Threading.Tasks;
+
+namespace Microsoft.AspNet.SignalR.Client
 {
     /// <summary>
     /// Typed Hub Proxy.
@@ -136,6 +138,134 @@
         /// <param name="wherePredicate">The callback will only be called when this predicate is true.</param>
         /// <param name="callback">The method that you handle the event.</param>
         void SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Action<T1, T2, T3, T4, T5, T6, T7>>> eventToBind, System.Func<T1, T2, T3, T4, T5, T6, T7, bool> wherePredicate, System.Action<T1, T2, T3, T4, T5, T6, T7> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="action">The method that you handle the event.</param>
+        void SubscribeOn(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<Task>>> eventToBind, System.Action action);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="callback">The method that handle the event.</param>
+        void SubscribeOn<T>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T, Task>>> eventToBind, System.Action<T> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="wherePredicate">The callback will only be called when this predicate is true.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T, Task>>> eventToBind, System.Func<T, bool> wherePredicate, System.Action<T> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, Task>>> eventToBind, System.Action<T1, T2> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="wherePredicate">The callback will only be called when this predicate is true.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, Task>>> eventToBind, System.Func<T1, T2, bool> wherePredicate, System.Action<T1, T2> callback);
+
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, Task>>> eventToBind, System.Action<T1, T2, T3> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="wherePredicate">The callback will only be called when this predicate is true.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, Task>>> eventToBind, System.Func<T1, T2, T3, bool> wherePredicate, System.Action<T1, T2, T3> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3, T4>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, T4, Task>>> eventToBind, System.Action<T1, T2, T3, T4> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="wherePredicate">The callback will only be called when this predicate is true.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3, T4>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, T4, Task>>> eventToBind, System.Func<T1, T2, T3, T4, bool> wherePredicate, System.Action<T1, T2, T3, T4> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3, T4, T5>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, T4, T5, Task>>> eventToBind, System.Action<T1, T2, T3, T4, T5> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="wherePredicate">The callback will only be called when this predicate is true.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3, T4, T5>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, T4, T5, Task>>> eventToBind, System.Func<T1, T2, T3, T4, T5, bool> wherePredicate, System.Action<T1, T2, T3, T4, T5> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3, T4, T5, T6>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, T4, T5, T6, Task>>> eventToBind, System.Action<T1, T2, T3, T4, T5, T6> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="wherePredicate">The callback will only be called when this predicate is true.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3, T4, T5, T6>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, T4, T5, T6, Task>>> eventToBind, System.Func<T1, T2, T3, T4, T5, T6, bool> wherePredicate, System.Action<T1, T2, T3, T4, T5, T6> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, T4, T5, T6, T7, Task>>> eventToBind, System.Action<T1, T2, T3, T4, T5, T6, T7> callback);
+
+        /// <summary>
+        ///     Subscribes to a hub event.
+        ///     <para>When the server hub send an event of the given type, the handler will be invoked.</para>
+        /// </summary>
+        /// <param name="eventToBind">The event method exposed by the server hub interface.</param>
+        /// <param name="wherePredicate">The callback will only be called when this predicate is true.</param>
+        /// <param name="callback">The method that you handle the event.</param>
+        void SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(System.Linq.Expressions.Expression<System.Func<TClientInterface, System.Func<T1, T2, T3, T4, T5, T6, T7, Task>>> eventToBind, System.Func<T1, T2, T3, T4, T5, T6, T7, bool> wherePredicate, System.Action<T1, T2, T3, T4, T5, T6, T7> callback);
 
         /// <summary>
         ///     Subscribes on all events (methods) which the server can trigger (invoke).
