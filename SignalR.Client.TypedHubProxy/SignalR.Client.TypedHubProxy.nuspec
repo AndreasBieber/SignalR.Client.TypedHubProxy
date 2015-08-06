@@ -5,13 +5,13 @@
         <version>2.2.0</version>
         <title>SignalR.Client.TypedHubProxy</title>
         <authors>Andreas Bieber</authors>
-        <owners>1&amp;1 Internet AG</owners>
+        <owners>Andreas Bieber</owners>
         <licenseUrl>https://github.com/Gandalis/SignalR.Client.TypedHubProxy/blob/master/LICENSE.md</licenseUrl>
         <projectUrl>https://github.com/Gandalis/SignalR.Client.TypedHubProxy</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>SignalR.Client.TypedHubProxy is a library which extends the SignalR.Client components to enable typed hub proxies.</description>
         <releaseNotes>https://github.com/Gandalis/SignalR.Client.TypedHubProxy/releases</releaseNotes>
-        <copyright>(c) 1&amp;1 Internet AG. All rights reserved.</copyright>
+        <copyright>(c) Andreas Bieber. All rights reserved.</copyright>
         <language>en-US</language>
         <tags>Microsoft AspNet SignalR AspNetSignalR Client TypedHubProxy Typed HubProxy</tags>
         <dependencies>
