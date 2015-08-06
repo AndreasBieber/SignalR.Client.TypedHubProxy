@@ -5,11 +5,11 @@
     using Xunit;
     using Utils;
 
-    public class TypedHubProxyTests : IUseFixture<TestFixtures.TypedHubProxyFixture>
+    public class TypedHubProxyTests : IClassFixture<TestFixtures.TypedHubProxyFixture>
     {
-        private TestFixtures.TypedHubProxyFixture _fixture;
+        private readonly TestFixtures.TypedHubProxyFixture _fixture;
 
-        public void SetFixture(TestFixtures.TypedHubProxyFixture data)
+        public TypedHubProxyTests(TestFixtures.TypedHubProxyFixture data)
         {
             _fixture = data;
         }

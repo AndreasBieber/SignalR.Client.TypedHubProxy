@@ -5,11 +5,11 @@
     using FluentAssertions;
     using Xunit;
 
-    public class ObservableHubProxyFacts : IUseFixture<TestFixtures.ObservableHubProxyFixture>
+    public class ObservableHubProxyFacts : IClassFixture<TestFixtures.ObservableHubProxyFixture>
     {
-        private TestFixtures.ObservableHubProxyFixture _fixture;
+        private readonly TestFixtures.ObservableHubProxyFixture _fixture;
 
-        public void SetFixture(TestFixtures.ObservableHubProxyFixture data)
+        public ObservableHubProxyFacts(TestFixtures.ObservableHubProxyFixture data)
         {
             _fixture = data;
         }
