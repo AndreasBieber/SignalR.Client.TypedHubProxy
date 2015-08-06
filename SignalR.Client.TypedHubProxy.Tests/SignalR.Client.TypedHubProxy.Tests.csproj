@@ -95,6 +95,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\TestClientContract.cs" />
     <Compile Include="TestFixtures\BaseFixture.cs" />
     <Compile Include="TestFixtures\ObservableHubProxyFixture.cs" />
     <Compile Include="TestFixtures\TypedHubProxyFixture.cs" />
@@ -109,7 +110,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="SignalR.Client.TypedHubProxy.Tests.snk" />
   </ItemGroup>
   <ItemGroup>

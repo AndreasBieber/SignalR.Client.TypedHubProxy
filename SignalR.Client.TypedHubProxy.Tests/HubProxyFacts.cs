@@ -1,4 +1,6 @@
-﻿namespace SignalR.Client.TypedHubProxy.Tests
+﻿using SignalR.Client.TypedHubProxy.Tests.Contracts;
+
+namespace SignalR.Client.TypedHubProxy.Tests
 {
     using System;
     using FluentAssertions;
@@ -252,6 +254,20 @@
             });
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing7Params(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6, inParam7));
             notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
+        }
+
+        [Fact]
+        public void TestSubscribeOnAll()
+        {
+            Action<object[]> actCallback = args =>
+            {
+                args[0].Should().Be(1);
+                args[1].Should().Be(2);
+            };
+
+            var clientContract = new TestClientContract(actCallback);
+            _fixture.Proxy.SubscribeOnAll(clientContract);
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing2Params(1, 2));
         }
     }
 }
