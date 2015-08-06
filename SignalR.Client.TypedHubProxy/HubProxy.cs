@@ -239,19 +239,7 @@
                                     .Select(p => string.Format("{0} {1}", p.ParameterType.Name, p.Name)))));
                 }
 
-                Type actionType;
-
-                if (parameterInfos.Any())
-                {
-                    actionType = parameterInfos.Length > 1
-                        ? typeof(Action<,>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray())
-                        : typeof(Action<>).MakeGenericType(parameterInfos.Select(p => p.ParameterType).ToArray());
-                }
-                else
-                {
-                    actionType = typeof(Action);
-                }
-
+                Type actionType = Expression.GetActionType(parameterInfos.Select(p => p.ParameterType).ToArray());
                 Delegate actionDelegate = Delegate.CreateDelegate(actionType, instance, methodInfo);
 
 

@@ -269,5 +269,26 @@ namespace SignalR.Client.TypedHubProxy.Tests
             _fixture.Proxy.SubscribeOnAll(clientContract);
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing2Params(1, 2));
         }
+
+        /// <summary>
+        /// Test bugfix for issue #9.
+        /// </summary>
+        [Fact]
+        public void TestSubscribeOnAllWithMoreThan2ParametersShouldNotFail()
+        {
+            Action<object[]> actCallback = args =>
+            {
+                args[0].Should().Be(1);
+                args[1].Should().Be(2);
+                args[2].Should().Be(3);
+            };
+
+            var clientContract = new TestClientContract(actCallback);
+            Action act = () => _fixture.Proxy.SubscribeOnAll(clientContract);
+
+            act.ShouldNotThrow(TestConsts.ERR_SHOULD_FIX_ISSUE_9);
+
+            _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing3Params(1, 2, 3));
+        }
     }
 }
