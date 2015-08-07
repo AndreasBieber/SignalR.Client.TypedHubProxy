@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionDetail.cs" />
+    <Compile Include="DisposableAction.cs" />
     <Compile Include="HubProxy.cs" />
     <Compile Include="HubProxyExtensions.cs" />
     <Compile Include="IHubProxy.cs" />

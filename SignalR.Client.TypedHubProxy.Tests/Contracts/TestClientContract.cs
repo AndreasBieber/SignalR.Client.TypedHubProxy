@@ -10,7 +10,7 @@ namespace SignalR.Client.TypedHubProxy.Tests.Contracts
         {
             if (callback == null)
             {
-                throw new ArgumentNullException("callback");
+                throw new ArgumentNullException(nameof(callback));
             }
 
             _callback = callback;
@@ -68,10 +68,7 @@ namespace SignalR.Client.TypedHubProxy.Tests.Contracts
 
         private void DoCallback(params object[] args)
         {
-            if (_callback != null)
-            {
-                _callback(args);
-            }
+            _callback?.Invoke(args);
         }
     }
 }

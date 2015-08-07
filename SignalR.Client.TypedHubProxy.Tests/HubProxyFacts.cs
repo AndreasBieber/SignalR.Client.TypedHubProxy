@@ -1,17 +1,19 @@
-﻿using SignalR.Client.TypedHubProxy.Tests.Contracts;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FluentAssertions;
+using SignalR.Client.TypedHubProxy.Tests.Contracts;
+using SignalR.Client.TypedHubProxy.Tests.TestFixtures;
+using SignalR.Client.TypedHubProxy.Tests.Utils;
+using Xunit;
 
 namespace SignalR.Client.TypedHubProxy.Tests
 {
-    using System;
-    using FluentAssertions;
-    using Xunit;
-    using Utils;
-
-    public class TypedHubProxyTests : IClassFixture<TestFixtures.TypedHubProxyFixture>
+    public class TypedHubProxyTests : IClassFixture<TypedHubProxyFixture>
     {
-        private readonly TestFixtures.TypedHubProxyFixture _fixture;
+        private readonly TypedHubProxyFixture _fixture;
 
-        public TypedHubProxyTests(TestFixtures.TypedHubProxyFixture data)
+        public TypedHubProxyTests(TypedHubProxyFixture data)
         {
             _fixture = data;
         }
@@ -50,7 +52,7 @@ namespace SignalR.Client.TypedHubProxy.Tests
             _fixture.HubProxyMock.SetupCallback(args =>
             {
                 invoked = true;
-                outParam1 = (Guid) args[0];
+                outParam1 = (Guid)args[0];
             })
             .Returns(TaskAsyncHelper.Empty);
 
@@ -70,7 +72,7 @@ namespace SignalR.Client.TypedHubProxy.Tests
             _fixture.HubProxyMock.SetupCallback(args =>
             {
                 invoked = true;
-                outParam1 = (Guid) args[0];
+                outParam1 = (Guid)args[0];
             })
             .Returns(TaskAsyncHelper.Empty);
 
@@ -87,7 +89,7 @@ namespace SignalR.Client.TypedHubProxy.Tests
             bool invoked = false;
 
             _fixture.HubProxyMock.SetupCallback<Guid>(args => invoked = true)
-                .Returns<string,object[]>((methodName, args) => TaskAsyncHelper.FromResult((Guid)args[0]));
+                .Returns<string, object[]>((methodName, args) => TaskAsyncHelper.FromResult((Guid)args[0]));
 
             Guid outParam1 = _fixture.Proxy.Call(hub => hub.ReturnGuid(inParam1));
 
@@ -128,8 +130,8 @@ namespace SignalR.Client.TypedHubProxy.Tests
             bool notified = false;
 
             _fixture.Proxy.SubscribeOn<int>(
-                eventToBind: hub => hub.Passing1Param, 
-                wherePredicate: param1 => param1 == 2, 
+                eventToBind: hub => hub.Passing1Param,
+                wherePredicate: param1 => param1 == 2,
                 callback: param1 => notified = true);
 
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing1Param(1));
@@ -176,12 +178,12 @@ namespace SignalR.Client.TypedHubProxy.Tests
             notified = false;
 
             // test with 2 parameter
-            _fixture.Proxy.SubscribeOn<int,int>(hub => hub.Passing2Params, (outParam1, outParam2) =>
-            {
-                notified = true;
-                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
-                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
-            });
+            _fixture.Proxy.SubscribeOn<int, int>(hub => hub.Passing2Params, (outParam1, outParam2) =>
+             {
+                 notified = true;
+                 outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                 outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+             });
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing2Params(inParam1, inParam2));
             notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
             notified = false;
@@ -199,59 +201,59 @@ namespace SignalR.Client.TypedHubProxy.Tests
             notified = false;
 
             // test with 4 parameter
-            _fixture.Proxy.SubscribeOn<int,int, int, int>(hub => hub.Passing4Params, (outParam1, outParam2, outParam3, outParam4) =>
-            {
-                notified = true;
-                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
-                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
-                outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
-                outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
-            });
+            _fixture.Proxy.SubscribeOn<int, int, int, int>(hub => hub.Passing4Params, (outParam1, outParam2, outParam3, outParam4) =>
+             {
+                 notified = true;
+                 outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                 outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+                 outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
+                 outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
+             });
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing4Params(inParam1, inParam2, inParam3, inParam4));
             notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
             notified = false;
 
             // test with 5 parameter
-            _fixture.Proxy.SubscribeOn<int,int, int, int, int>(hub => hub.Passing5Params, (outParam1, outParam2, outParam3, outParam4, outParam5) =>
-            {
-                notified = true;
-                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
-                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
-                outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
-                outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
-                outParam5.Should().Be(inParam5, TestConsts.ERR_PARAM_MISMATCH, "outParam5", inParam5, outParam5);
-            });
+            _fixture.Proxy.SubscribeOn<int, int, int, int, int>(hub => hub.Passing5Params, (outParam1, outParam2, outParam3, outParam4, outParam5) =>
+             {
+                 notified = true;
+                 outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                 outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+                 outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
+                 outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
+                 outParam5.Should().Be(inParam5, TestConsts.ERR_PARAM_MISMATCH, "outParam5", inParam5, outParam5);
+             });
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing5Params(inParam1, inParam2, inParam3, inParam4, inParam5));
             notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
             notified = false;
 
             // test with 6 parameter
-            _fixture.Proxy.SubscribeOn<int,int, int, int, int, int>(hub => hub.Passing6Params, (outParam1, outParam2, outParam3, outParam4, outParam5, outParam6) =>
-            {
-                notified = true;
-                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
-                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
-                outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
-                outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
-                outParam5.Should().Be(inParam5, TestConsts.ERR_PARAM_MISMATCH, "outParam5", inParam5, outParam5);
-                outParam6.Should().Be(inParam6, TestConsts.ERR_PARAM_MISMATCH, "outParam6", inParam6, outParam6);
-            });
+            _fixture.Proxy.SubscribeOn<int, int, int, int, int, int>(hub => hub.Passing6Params, (outParam1, outParam2, outParam3, outParam4, outParam5, outParam6) =>
+             {
+                 notified = true;
+                 outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                 outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+                 outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
+                 outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
+                 outParam5.Should().Be(inParam5, TestConsts.ERR_PARAM_MISMATCH, "outParam5", inParam5, outParam5);
+                 outParam6.Should().Be(inParam6, TestConsts.ERR_PARAM_MISMATCH, "outParam6", inParam6, outParam6);
+             });
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing6Params(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6));
             notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
             notified = false;
 
             // test with 7 parameter
-            _fixture.Proxy.SubscribeOn<int,int, int, int, int, int, int>(hub => hub.Passing7Params, (outParam1, outParam2, outParam3, outParam4, outParam5, outParam6, outParam7) =>
-            {
-                notified = true;
-                outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
-                outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
-                outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
-                outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
-                outParam5.Should().Be(inParam5, TestConsts.ERR_PARAM_MISMATCH, "outParam5", inParam5, outParam5);
-                outParam6.Should().Be(inParam6, TestConsts.ERR_PARAM_MISMATCH, "outParam6", inParam6, outParam6);
-                outParam7.Should().Be(inParam7, TestConsts.ERR_PARAM_MISMATCH, "outParam7", inParam7, outParam7);
-            });
+            _fixture.Proxy.SubscribeOn<int, int, int, int, int, int, int>(hub => hub.Passing7Params, (outParam1, outParam2, outParam3, outParam4, outParam5, outParam6, outParam7) =>
+             {
+                 notified = true;
+                 outParam1.Should().Be(inParam1, TestConsts.ERR_PARAM_MISMATCH, "outParam1", inParam1, outParam1);
+                 outParam2.Should().Be(inParam2, TestConsts.ERR_PARAM_MISMATCH, "outParam2", inParam2, outParam2);
+                 outParam3.Should().Be(inParam3, TestConsts.ERR_PARAM_MISMATCH, "outParam3", inParam3, outParam3);
+                 outParam4.Should().Be(inParam4, TestConsts.ERR_PARAM_MISMATCH, "outParam4", inParam4, outParam4);
+                 outParam5.Should().Be(inParam5, TestConsts.ERR_PARAM_MISMATCH, "outParam5", inParam5, outParam5);
+                 outParam6.Should().Be(inParam6, TestConsts.ERR_PARAM_MISMATCH, "outParam6", inParam6, outParam6);
+                 outParam7.Should().Be(inParam7, TestConsts.ERR_PARAM_MISMATCH, "outParam7", inParam7, outParam7);
+             });
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing7Params(inParam1, inParam2, inParam3, inParam4, inParam5, inParam6, inParam7));
             notified.Should().BeTrue(TestConsts.ERR_PROXY_RECEIVE_EVENT);
         }
@@ -266,8 +268,10 @@ namespace SignalR.Client.TypedHubProxy.Tests
             };
 
             var clientContract = new TestClientContract(actCallback);
-            _fixture.Proxy.SubscribeOnAll(clientContract);
+            IEnumerable<IDisposable> subscriptions = _fixture.Proxy.SubscribeOnAll(clientContract);
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing2Params(1, 2));
+
+            subscriptions?.ToList().ForEach(s => s.Dispose());
         }
 
         /// <summary>
@@ -284,11 +288,13 @@ namespace SignalR.Client.TypedHubProxy.Tests
             };
 
             var clientContract = new TestClientContract(actCallback);
-            Action act = () => _fixture.Proxy.SubscribeOnAll(clientContract);
-
+            IEnumerable<IDisposable> subscriptions = null;
+            Action act = () => subscriptions = _fixture.Proxy.SubscribeOnAll(clientContract);
             act.ShouldNotThrow(TestConsts.ERR_SHOULD_FIX_ISSUE_9);
 
             _fixture.HubProxyMock.Object.InvokeEvent(hub => hub.Passing3Params(1, 2, 3));
+
+            subscriptions?.ToList().ForEach(s => s.Dispose());
         }
     }
 }

@@ -102,112 +102,112 @@
 
         #region IHubProxy implementations
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn(
             Expression<Func<TClientInterface, Action>> eventToBind, Action callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback);
+            return CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
             Expression<Func<TClientInterface, Action<T>>> eventToBind, Action<T> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback);
+            return CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T>(
             Expression<Func<TClientInterface, Action<T>>> eventToBind, Func<T, bool> wherePredicate, Action<T> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+            return CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
             Expression<Func<TClientInterface, Action<T1, T2>>> eventToBind,
             Action<T1, T2> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback);
+            return CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2>(
             Expression<Func<TClientInterface, Action<T1, T2>>> eventToBind, Func<T1, T2, bool> wherePredicate,
             Action<T1, T2> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+            return CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
             Expression<Func<TClientInterface, Action<T1, T2, T3>>> eventToBind,
             Action<T1, T2, T3> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback);
+            return CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3>(
             Expression<Func<TClientInterface, Action<T1, T2, T3>>> eventToBind, Func<T1, T2, T3, bool> wherePredicate,
             Action<T1, T2, T3> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+            return CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4>>> eventToBind,
             Action<T1, T2, T3, T4> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback);
+            return CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4>>> eventToBind,
             Func<T1, T2, T3, T4, bool> wherePredicate, Action<T1, T2, T3, T4> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+            return CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5>>> eventToBind,
             Action<T1, T2, T3, T4, T5> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback);
+            return CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5>>> eventToBind,
             Func<T1, T2, T3, T4, T5, bool> wherePredicate,
             Action<T1, T2, T3, T4, T5> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+            return CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6>>> eventToBind,
             Action<T1, T2, T3, T4, T5, T6> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback);
+            return CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6>>> eventToBind,
             Func<T1, T2, T3, T4, T5, T6, bool> wherePredicate,
             Action<T1, T2, T3, T4, T5, T6> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+            return CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6, T7>>> eventToBind,
             Action<T1, T2, T3, T4, T5, T6, T7> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback);
+            return CreateSubscription(eventToBind.GetMethodName(), callback);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
+        IDisposable IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOn<T1, T2, T3, T4, T5, T6, T7>(
             Expression<Func<TClientInterface, Action<T1, T2, T3, T4, T5, T6, T7>>> eventToBind,
             Func<T1, T2, T3, T4, T5, T6, T7, bool> wherePredicate,
             Action<T1, T2, T3, T4, T5, T6, T7> callback)
         {
-            CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
+            return CreateSubscription(eventToBind.GetMethodName(), callback, wherePredicate);
         }
 
-        void IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOnAll(object instance)
+        IEnumerable<IDisposable> IHubProxy<TServerHubInterface, TClientInterface>.SubscribeOnAll(object instance)
         {
             if (instance == null)
             {
@@ -242,8 +242,7 @@
                 Type actionType = Expression.GetActionType(parameterInfos.Select(p => p.ParameterType).ToArray());
                 Delegate actionDelegate = Delegate.CreateDelegate(actionType, instance, methodInfo);
 
-
-                CreateSubscription(methodInfo.Name, actionDelegate);
+                yield return CreateSubscription(methodInfo.Name, actionDelegate);
             }
         }
 
@@ -294,7 +293,7 @@
             return obj.ToObject<T>(serializer);
         }
 
-        private void CreateSubscription(string eventName, Delegate callback, Delegate wherePredicate = null)
+        private IDisposable CreateSubscription(string eventName, Delegate callback, Delegate wherePredicate = null)
         {
             Hubs.Subscription subscription = _hubProxy.Subscribe(eventName);
 
@@ -335,6 +334,11 @@
             {
                 _subscriptions.Add(subscription, handler);
             }
+
+            return new DisposableAction(() =>
+            {
+                subscription.Received -= handler;
+            });
         }
     }
 }
