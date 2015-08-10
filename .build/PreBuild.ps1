@@ -7,7 +7,7 @@ Param(
 	[Parameter(Mandatory=$True)][string]$AssemblyInfoPath,
 	[Parameter(Mandatory=$True)][string]$BuildCounter,
 	[Parameter(Mandatory=$True)][string]$CurrentBranch,
-	[Parameter(Mandatory=$False)][bool]$IsRelease
+	[Parameter(Mandatory=$False)][switch]$IsRelease
 )
 
 $ErrorActionPreference = "Stop"
@@ -33,7 +33,7 @@ $creds = Get-CredentialHeader -User $TeamCityUser -Pass $TeamCityPass
 $assemblyVersion = [version] (Get-AssemblyVersionFromAssemblyInfo -File $AssemblyInfoPath)
 
 # Derive fileVersion and informationalVersion from assembly version
-$derivedVersions = Generate-FileAndInformationalVersion -AssemblyVersion $assemblyVersion -BuildCounter $BuildCounter -Branch $CurrentBranch -IsRelease $IsRelease
+$derivedVersions = Generate-FileAndInformationalVersion -AssemblyVersion $assemblyVersion -BuildCounter $BuildCounter -Branch $CurrentBranch -IsRelease:$IsRelease.IsPresent
 $fileVersion = $derivedVersions[0]
 $informationalVersion = $derivedVersions[1]
 

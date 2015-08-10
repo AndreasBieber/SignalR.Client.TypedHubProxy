@@ -2,7 +2,7 @@
 <package>
     <metadata>
         <id>SignalR.Client.TypedHubProxy</id>
-        <version>0.0.0</version>
+        <version>$version$</version>
         <title>SignalR.Client.TypedHubProxy</title>
         <authors>Andreas Bieber</authors>
         <owners>Andreas Bieber</owners>
@@ -15,12 +15,12 @@
         <language>en-US</language>
         <tags>Microsoft AspNet SignalR AspNetSignalR Client TypedHubProxy Typed HubProxy</tags>
         <dependencies>
-            <group targetFramework=".NETFramework4.5">
-                <!-- Dependencies added by build process -->
-            </group>
+			<dependency id="Microsoft.AspNet.SignalR.Client" version="2.1.2" />
+			<dependency id="Newtonsoft.Json" version="6.0.4" />
         </dependencies>
     </metadata>
     <files>
-        <!-- Files added by build process -->
+        <file src="src\SignalR.Client.TypedHubProxy\bin\Release\SignalR.Client.TypedHubProxy.dll" target="lib\net45\SignalR.Client.TypedHubProxy.dll" />		
+        <file src="src\SignalR.Client.TypedHubProxy\bin\Release\SignalR.Client.TypedHubProxy.xml" target="lib\net45\SignalR.Client.TypedHubProxy.xml" />
     </files>
 </package>
