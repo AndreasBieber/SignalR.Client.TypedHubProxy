@@ -17,8 +17,8 @@ if (-not (Test-Path $AssemblyInfoPath)) {
 }
 
 # Include scripts
-. .\build\Utils.ps1
-. .\build\Teamcity-Functions.ps1
+. .\.build\Utils.ps1
+. .\.build\Teamcity-Functions.ps1
 
 # Sometimes the branch will be a full path, e.g., 'refs/heads/master'. 
 # If so we'll base our logic just on the last part.
