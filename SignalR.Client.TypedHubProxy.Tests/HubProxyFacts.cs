@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.AspNet.SignalR.Client;
 using SignalR.Client.TypedHubProxy.Tests.Contracts;
 using SignalR.Client.TypedHubProxy.Tests.TestFixtures;
 using SignalR.Client.TypedHubProxy.Tests.Utils;
