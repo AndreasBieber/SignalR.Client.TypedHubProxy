@@ -2,7 +2,7 @@
 <package>
     <metadata>
         <id>SignalR.Client.TypedHubProxy</id>
-        <version>2.2.0</version>
+        <version>0.0.0</version>
         <title>SignalR.Client.TypedHubProxy</title>
         <authors>Andreas Bieber</authors>
         <owners>Andreas Bieber</owners>
