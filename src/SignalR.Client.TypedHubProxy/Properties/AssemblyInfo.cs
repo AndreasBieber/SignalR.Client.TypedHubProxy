@@ -29,6 +29,6 @@ using System.Runtime.InteropServices;
 [assembly: Guid("f45fcb60-7e77-4439-8eac-b254f57a3978")]
 
 // The following version numbers will be set/increased by the appveyor build process
-[assembly: AssemblyVersion("0.0.1")]
+[assembly: AssemblyVersion("3.0.2")]
 [assembly: AssemblyFileVersion("0.0.0")]
 [assembly: AssemblyInformationalVersion("0.0.0")]
