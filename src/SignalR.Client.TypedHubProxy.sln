@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.Client.TypedHubProxy", "SignalR.Client.TypedHubProxy\SignalR.Client.TypedHubProxy.csproj", "{8B6EA8A1-62B7-49BB-88BA-865B3D7AA370}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{12745B3A-DAFE-4B43-8A58-BC25B66330C3}"
@@ -14,11 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{12745B
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.Client.TypedHubProxy.Tests", "SignalR.Client.TypedHubProxy.Tests\SignalR.Client.TypedHubProxy.Tests.csproj", "{C0466E83-C3F3-451B-BD8F-BAFF52898C5C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{6D3933FA-C7F9-4E5F-BC54-56AAA574862D}"
-	ProjectSection(SolutionItems) = preProject
-		scripts\GetVersion.ps1 = scripts\GetVersion.ps1
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
