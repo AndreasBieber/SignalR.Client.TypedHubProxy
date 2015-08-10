@@ -38,7 +38,7 @@ $fileVersion = $derivedVersions[0]
 $informationalVersion = $derivedVersions[1]
 
 # Try to get last built version from teamcity
-$lastBuiltVersion = [version] (Get-TeamcityBuildTypeParameter -BaseUrl $TeamCityUrl -Credentials $creds -BuildTypeId $TeamCityBuildTypeId -Parameter "system.lastBuiltVersion")
+$lastBuiltVersion = [version] (Get-TeamcityBuildTypeParameter -BaseUrl $TeamCityUrl -Credentials $creds -BuildTypeId $TeamCityBuildTypeId -Parameter "system.lastBuiltVersion" -CreateIfNotExist -DefaultValue $assemblyVersion)
 
 # Check whether assemblyinfo version is greater than last built version.
 # If so, we have to reset the TeamCity buildCounter.
