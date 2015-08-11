@@ -12,6 +12,7 @@ Param(
 
 $ErrorActionPreference = "Stop"
 
+try {
 if (-not (Test-Path $AssemblyInfoPath)) {
 	Throw "Could not find file $AssemblyInfoPath"
 }
@@ -69,3 +70,8 @@ Set-TeamcityParameter -Parameter "env.informationalVersion" -Value $informationa
 
 # Set buildNumber
 Write-Host "##teamcity[buildNumber '$informationalVersion']"
+} catch {
+	Write-Error $_
+	##teamcity[buildStatus status='FAILURE' ]
+    exit 1
+}
