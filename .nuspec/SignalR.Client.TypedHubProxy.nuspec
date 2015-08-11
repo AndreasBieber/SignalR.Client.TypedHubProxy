@@ -1,26 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
-    <metadata>
-        <id>SignalR.Client.TypedHubProxy</id>
-        <version>$version$</version>
-        <title>SignalR.Client.TypedHubProxy</title>
-        <authors>Andreas Bieber</authors>
-        <owners>Andreas Bieber</owners>
-        <licenseUrl>https://github.com/Gandalis/SignalR.Client.TypedHubProxy/blob/master/LICENSE.md</licenseUrl>
-        <projectUrl>https://github.com/Gandalis/SignalR.Client.TypedHubProxy</projectUrl>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>SignalR.Client.TypedHubProxy is a library which extends the SignalR.Client components to enable typed hub proxies.</description>
-        <releaseNotes>https://github.com/Gandalis/SignalR.Client.TypedHubProxy/releases</releaseNotes>
-        <copyright>(c) Andreas Bieber. All rights reserved.</copyright>
-        <language>en-US</language>
-        <tags>Microsoft AspNet SignalR AspNetSignalR Client TypedHubProxy Typed HubProxy</tags>
-        <dependencies>
-			<dependency id="Microsoft.AspNet.SignalR.Client" version="2.1.2" />
-			<dependency id="Newtonsoft.Json" version="6.0.4" />
-        </dependencies>
-    </metadata>
-    <files>
-        <file src="src\SignalR.Client.TypedHubProxy\bin\Release\SignalR.Client.TypedHubProxy.dll" target="lib\net45\SignalR.Client.TypedHubProxy.dll" />		
-        <file src="src\SignalR.Client.TypedHubProxy\bin\Release\SignalR.Client.TypedHubProxy.xml" target="lib\net45\SignalR.Client.TypedHubProxy.xml" />
-    </files>
+  <metadata>
+    <id>SignalR.Client.TypedHubProxy</id>
+    <version>$version$</version>
+    <title>SignalR.Client.TypedHubProxy</title>
+    <authors>Andreas Bieber</authors>
+    <owners>Andreas Bieber</owners>
+    <licenseUrl>https://github.com/Gandalis/SignalR.Client.TypedHubProxy/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/Gandalis/SignalR.Client.TypedHubProxy</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>SignalR.Client.TypedHubProxy is a library which extends the SignalR.Client components to enable typed hub proxies.</description>
+    <releaseNotes>https://github.com/Gandalis/SignalR.Client.TypedHubProxy/releases</releaseNotes>
+    <copyright>(c) Andreas Bieber. All rights reserved.</copyright>
+    <language>en-US</language>
+    <tags>Microsoft AspNet SignalR AspNetSignalR Client TypedHubProxy Typed HubProxy</tags>
+    <dependencies>
+      <dependency id="Microsoft.AspNet.SignalR.Client" version="2.1.2" />
+      <dependency id="Newtonsoft.Json" version="6.0.4" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="src\SignalR.Client.TypedHubProxy\bin\Release\SignalR.Client.TypedHubProxy.dll" target="lib\net45\SignalR.Client.TypedHubProxy.dll" />
+    <file src="src\SignalR.Client.TypedHubProxy\bin\Release\SignalR.Client.TypedHubProxy.xml" target="lib\net45\SignalR.Client.TypedHubProxy.xml" />
+  </files>
 </package>
