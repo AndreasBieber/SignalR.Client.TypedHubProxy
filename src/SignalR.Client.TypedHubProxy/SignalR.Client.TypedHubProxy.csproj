@@ -63,7 +63,7 @@
     <Compile Include="ActionDetail.cs" />
     <Compile Include="DisposableAction.cs" />
     <Compile Include="HubProxy.cs" />
-    <Compile Include="HubProxyExtensions.cs" />
+    <Compile Include="SignalRExtensions.cs" />
     <Compile Include="IHubProxy.cs" />
     <Compile Include="ExtensionsInternal.cs" />
     <Compile Include="IObservableHubProxy.cs" />

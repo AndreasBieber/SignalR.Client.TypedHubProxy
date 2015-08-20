@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides several extension methods.
     /// </summary>
-    public static class HubProxyExtensions
+    public static class SignalRExtensions
     {
         /// <summary>
         ///     Creates a strongly typed hub proxy with the specified hub name.
