@@ -78,19 +78,7 @@ hubProxy.Invoke("DoSomething", new object[0]);
 ```
 What really bugged me out was the lack of strongly typed invocation.
 So SignalR.Client.TypedHubProxy enables strongly typed invocation and much more. The following code sample shows you exactly what can it be used for:
-```csharp
-IHubProxy<IServerHub, IClientContract> hubProxy = hubConnection.CreateHubProxy<IServerHub, IClientContract>("serverHub");
 
-// Here you can define the method which should be called - strongly typed.
-hubProxy.Call(hub => hub.DoSomething());
-
-// For methods with parameters, just handover the parameter.
-hubProxy.Call(hub => hub.DoSomethingWithParam(5));
-
-// For methods with a result, you can receive it as expected.
-int result = hubProxy.Call<int>(hub => hub.DoSomethingWithParamAndResult(5));
-```
-Async calls are also possible:
 ```csharp
 await hubProxy.CallAsync(hub => hub.DoSomething());
 await hubProxy.CallAsync(hub => hub.DoSomethingWithParam(5));
