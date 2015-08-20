@@ -13,20 +13,6 @@ namespace Microsoft.AspNet.SignalR.Client
     {
         /// <summary>
         ///     Calls a method on the server hub.
-        ///     <para>This call will be executed synchronously.</para>
-        /// </summary>
-        /// <param name="call">The method to call. Use like: <code>hub => hub.MyMethod("param1", "param2")</code></param>
-        void Call(Expression<Action<TServerHubInterface>> call);
-
-        /// <summary>
-        ///     Calls a method on the server hub.
-        ///     <para>This call will be executed synchronously and will wait till the server has sent a response.</para>
-        /// </summary>
-        /// <param name="call">The method to call. Use like: <code>hub => hub.MyMethod("param1", "param2")</code></param>
-        TResult Call<TResult>(Expression<Func<TServerHubInterface, TResult>> call);
-
-        /// <summary>
-        ///     Calls a method on the server hub.
         ///     <para>This call will be executed asynchronously.</para>
         /// </summary>
         /// <param name="call">The method to call. Use like: <code>hub => hub.MyMethod("param1", "param2")</code></param>

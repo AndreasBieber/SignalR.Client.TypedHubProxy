@@ -58,18 +58,7 @@
         }
 
         #region ITypedHubOneWayProxy implementations
-
-        void IHubProxyOneWay<TServerHubInterface>.Call(Expression<Action<TServerHubInterface>> call)
-        {
-            ((IHubProxyOneWay<TServerHubInterface>)this).CallAsync(call).Wait();
-        }
-
-        TResult IHubProxyOneWay<TServerHubInterface>.Call<TResult>(
-            Expression<Func<TServerHubInterface, TResult>> call)
-        {
-            return ((IHubProxyOneWay<TServerHubInterface>)this).CallAsync(call).Result;
-        }
-
+        
         Task IHubProxyOneWay<TServerHubInterface>.CallAsync(
             Expression<Action<TServerHubInterface>> call)
         {

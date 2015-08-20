@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Microsoft.AspNet.SignalR.Client;
 using SignalR.Client.TypedHubProxy.Tests.Contracts;
 using SignalR.Client.TypedHubProxy.Tests.TestFixtures;
 using SignalR.Client.TypedHubProxy.Tests.Utils;
@@ -20,18 +19,6 @@ namespace SignalR.Client.TypedHubProxy.Tests
         }
 
         [Fact]
-        public void TestCall()
-        {
-            bool invoked = false;
-
-            _fixture.HubProxyMock.SetupCallback(args => invoked = true)
-                .Returns(TaskAsyncHelper.Empty);
-
-            _fixture.Proxy.Call(hub => hub.DoNothing());
-            invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
-        }
-
-        [Fact]
         public void TestCallAsync()
         {
             bool invoked = false;
@@ -41,26 +28,6 @@ namespace SignalR.Client.TypedHubProxy.Tests
 
             _fixture.Proxy.CallAsync(hub => hub.DoNothing());
             invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
-        }
-
-        [Fact]
-        public void TestCallWithParam()
-        {
-            Guid inParam1 = Guid.NewGuid();
-            Guid outParam1 = Guid.Empty;
-            bool invoked = false;
-
-            _fixture.HubProxyMock.SetupCallback(args =>
-            {
-                invoked = true;
-                outParam1 = (Guid)args[0];
-            })
-            .Returns(TaskAsyncHelper.Empty);
-
-            _fixture.Proxy.Call(hub => hub.DoNothingWithParam(inParam1));
-
-            invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
-            outParam1.Should().Be(inParam1, TestConsts.ERR_PROXY_ROUTE_CORRECTLY);
         }
 
         [Fact]
@@ -78,21 +45,6 @@ namespace SignalR.Client.TypedHubProxy.Tests
             .Returns(TaskAsyncHelper.Empty);
 
             _fixture.Proxy.CallAsync(hub => hub.DoNothingWithParam(inParam1));
-
-            invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
-            outParam1.Should().Be(inParam1, TestConsts.ERR_PROXY_ROUTE_CORRECTLY);
-        }
-
-        [Fact]
-        public void TestCallWithResult()
-        {
-            Guid inParam1 = Guid.NewGuid();
-            bool invoked = false;
-
-            _fixture.HubProxyMock.SetupCallback<Guid>(args => invoked = true)
-                .Returns<string, object[]>((methodName, args) => TaskAsyncHelper.FromResult((Guid)args[0]));
-
-            Guid outParam1 = _fixture.Proxy.Call(hub => hub.ReturnGuid(inParam1));
 
             invoked.Should().BeTrue(TestConsts.ERR_PROXY_INVOKED_CORRECTLY);
             outParam1.Should().Be(inParam1, TestConsts.ERR_PROXY_ROUTE_CORRECTLY);
