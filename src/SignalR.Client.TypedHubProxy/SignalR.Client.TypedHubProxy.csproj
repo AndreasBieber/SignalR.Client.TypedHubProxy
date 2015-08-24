@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionDetail.cs" />
+    <Compile Include="Annotations.cs" />
     <Compile Include="DisposableAction.cs" />
     <Compile Include="HubProxy.cs" />
     <Compile Include="SignalRExtensions.cs" />

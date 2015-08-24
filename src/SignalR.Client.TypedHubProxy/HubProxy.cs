@@ -5,6 +5,8 @@
     using System.Linq.Expressions;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
     /// <summary>
     /// Typed HubProxy for SignalR.
@@ -19,12 +21,6 @@
         private const string ERR_NOT_AN_INTERFACE = "\"{0}\" is not an interface.";
 
         private readonly IHubProxy _hubProxy;
-        private readonly System.Reflection.MethodInfo _convertStub =
-            typeof(HubProxy<TServerHubInterface, TClientInterface>).GetMethod("Convert",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-
-        private readonly Dictionary<Hubs.Subscription, Action<IList<Newtonsoft.Json.Linq.JToken>>> _subscriptions =
-            new Dictionary<Hubs.Subscription, Action<IList<Newtonsoft.Json.Linq.JToken>>>();
 
         /// <summary>
         /// Ctor of HubProxy.
@@ -33,14 +29,14 @@
         /// <exception cref="ArgumentException"></exception>
         public HubProxy(IHubProxy hubProxy)
         {
-            if (!typeof(TServerHubInterface).IsInterface)
+            if (!typeof (TServerHubInterface).IsInterface)
             {
-                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof(TServerHubInterface).Name));
+                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof (TServerHubInterface).Name));
             }
 
-            if (!typeof(TClientInterface).IsInterface)
+            if (!typeof (TClientInterface).IsInterface)
             {
-                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof(TClientInterface).Name));
+                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof (TClientInterface).Name));
             }
 
 
@@ -58,7 +54,7 @@
         }
 
         #region ITypedHubOneWayProxy implementations
-        
+
         Task IHubProxyOneWay<TServerHubInterface>.CallAsync(
             Expression<Action<TServerHubInterface>> call)
         {
@@ -200,16 +196,16 @@
         {
             if (instance == null)
             {
-                throw new ArgumentNullException("instance");
+                throw new ArgumentNullException(nameof(instance));
             }
 
             if (!(instance is TClientInterface))
             {
-                throw new System.Data.ConstraintException(string.Format("{0} doesn't implements the interface {1}.",
-                    instance.GetType().Name, typeof(TClientInterface).Name));
+                throw new System.Data.ConstraintException(
+                    $"{instance.GetType().Name} doesn't implements the interface {typeof (TClientInterface).Name}.");
             }
 
-            System.Reflection.MethodInfo[] methodInfos = typeof(TClientInterface).GetMethods();
+            System.Reflection.MethodInfo[] methodInfos = typeof (TClientInterface).GetMethods();
 
             foreach (System.Reflection.MethodInfo methodInfo in methodInfos)
             {
@@ -220,12 +216,12 @@
                     throw new NotSupportedException(
                         string.Format(
                             "Only interface methods with less or equal 7 parameters are supported: {0}.{1}({2})!",
-                        // ReSharper disable once PossibleNullReferenceException
+                            // ReSharper disable once PossibleNullReferenceException
                             methodInfo.DeclaringType.FullName.Replace("+", "."),
                             methodInfo.Name,
                             string.Join(", ",
                                 methodInfo.GetParameters()
-                                    .Select(p => string.Format("{0} {1}", p.ParameterType.Name, p.Name)))));
+                                    .Select(p => $"{p.ParameterType.Name} {p.Name}"))));
                 }
 
                 Type actionType = Expression.GetActionType(parameterInfos.Select(p => p.ParameterType).ToArray());
@@ -247,87 +243,71 @@
 
         #endregion
 
-        #region IDisposable implementation
-
-        /// <summary>
-        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <filterpriority>2</filterpriority>
-        public void Dispose()
-        {
-            foreach (var kvp in _subscriptions)
-            {
-                kvp.Key.Received -= kvp.Value;
-            }
-
-            _subscriptions.Clear();
-        }
-
-        #endregion
-
-        /// <summary>
-        ///     Deserialization of incoming data object.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="serializer"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        protected static T Convert<T>(Newtonsoft.Json.Linq.JToken obj, Newtonsoft.Json.JsonSerializer serializer)
-        {
-            if (obj == null)
-            {
-                return default(T);
-            }
-
-            return obj.ToObject<T>(serializer);
-        }
-
         private IDisposable CreateSubscription(string eventName, Delegate callback, Delegate wherePredicate = null)
         {
-            Hubs.Subscription subscription = _hubProxy.Subscribe(eventName);
+            Type callbackType = callback.GetType();
+            Type[] callbackGenericArguments = callbackType.GetGenericArguments();
 
-            Type[] genericArguments = callback.GetType().GetGenericArguments();
+            IEnumerable<MethodInfo> methodInfos = typeof (HubProxyExtensions)
+                .GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Where(m =>
+                    m.Name.Equals(nameof(HubProxyExtensions.On)));
 
-            Action<IList<Newtonsoft.Json.Linq.JToken>> handler = args =>
+            if (callbackGenericArguments.Any())
             {
-                if (genericArguments.Length == 0)
-                {
-                    callback.DynamicInvoke();
-                }
-                else
-                {
-                    object[] genericArgs = genericArguments
-                        .Select(t => _convertStub.MakeGenericMethod(t))
-                        .Select(
-                            (convertMethod, i) =>
-                                convertMethod.Invoke(null, new object[] { args[i], _hubProxy.JsonSerializer }))
-                        .ToArray();
-
-                    if (wherePredicate != null)
-                    {
-                        if ((bool)wherePredicate.DynamicInvoke(genericArgs))
-                        {
-                            callback.DynamicInvoke(genericArgs);
-                        }
-                    }
-                    else
-                    {
-                        callback.DynamicInvoke(genericArgs);
-                    }
-                }
-            };
-
-            subscription.Received += handler;
-
-            if (!_subscriptions.ContainsKey(subscription))
-            {
-                _subscriptions.Add(subscription, handler);
+                methodInfos = methodInfos.Where(
+                    m =>
+                        m.GetParameters()
+                            .Last()
+                            .ParameterType
+                            .GenericTypeArguments
+                            .Count()
+                            .Equals(callbackGenericArguments.Count()));
             }
 
-            return new DisposableAction(() =>
+            MethodInfo relatedOnMethodStub = methodInfos.First();
+
+            var relatedOnMethod = relatedOnMethodStub.IsGenericMethodDefinition
+                ? relatedOnMethodStub.MakeGenericMethod(callbackGenericArguments)
+                : relatedOnMethodStub;
+
+
+            Delegate callbackToInvoke = callback;
+
+            if (wherePredicate != null)
             {
-                subscription.Received -= handler;
-            });
+                // Create parameterexpressions for all callback-args
+                IEnumerable<ParameterExpression> parameterExpressions =
+                    callbackGenericArguments.Select(Expression.Parameter).ToList();
+
+                // Create invoke-expression to evaluate the where-predicate
+                InvocationExpression wherePredicateInvocation = Expression.Invoke(Expression.Constant(wherePredicate),
+                    parameterExpressions);
+
+                // Create invoke-expression for the original callback
+                InvocationExpression callbackInvocation = Expression.Invoke(Expression.Constant(callback),
+                    parameterExpressions);
+
+                // Create conditional-expression to evaluate the where-predicate. If the result is true, the original callback will be invoked
+                ConditionalExpression invokeCallbackIfWherePredicateIsTrue = Expression.IfThen(
+                    wherePredicateInvocation, callbackInvocation);
+
+                // Compile the expression to create the callbackWrapper-delegate
+                callbackToInvoke =
+                    Expression.Lambda(invokeCallbackIfWherePredicateIsTrue, parameterExpressions).Compile();
+            }
+
+            // Invoke HubProxyExtensions.On
+            var invokeResult = relatedOnMethod.Invoke(null, new object[] {_hubProxy, eventName, callbackToInvoke});
+            return (IDisposable) invokeResult;
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            // nothing to dispose
         }
     }
 }
