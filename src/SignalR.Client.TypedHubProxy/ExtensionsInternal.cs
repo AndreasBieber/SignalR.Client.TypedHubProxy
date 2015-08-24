@@ -1,9 +1,10 @@
-﻿namespace Microsoft.AspNet.SignalR.Client
-{
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
+namespace Microsoft.AspNet.SignalR.Client
+{
     internal static class ExtensionsInternal
     {
         private const string ERR_ACTION_MUST_BE_METHODCALL = "Action must be a method call";
@@ -13,15 +14,15 @@
         {
             if (!(action.Body is MethodCallExpression))
             {
-                throw new ArgumentException(ERR_ACTION_MUST_BE_METHODCALL, "action");
+                throw new ArgumentException(ERR_ACTION_MUST_BE_METHODCALL, nameof(action));
             }
 
-            var callExpression = (MethodCallExpression)action.Body;
+            var callExpression = (MethodCallExpression) action.Body;
 
             var actionDetail = new ActionDetail
             {
                 MethodName = callExpression.Method.Name,
-                Parameters = callExpression.Arguments.Select(ConvertToConstant).ToArray(),
+                Parameters = callExpression.Arguments.Select(ConvertToConstant).ToArray()
             };
 
             return actionDetail;
@@ -31,16 +32,16 @@
         {
             if (!(action.Body is MethodCallExpression))
             {
-                throw new ArgumentException(ERR_ACTION_MUST_BE_METHODCALL, "action");
+                throw new ArgumentException(ERR_ACTION_MUST_BE_METHODCALL, nameof(action));
             }
 
-            var callExpression = (MethodCallExpression)action.Body;
+            var callExpression = (MethodCallExpression) action.Body;
 
             var actionDetail = new ActionDetail
             {
                 MethodName = callExpression.Method.Name,
                 Parameters = callExpression.Arguments.Select(ConvertToConstant).ToArray(),
-                ReturnType = typeof(TResult)
+                ReturnType = typeof (TResult)
             };
 
             return actionDetail;
@@ -48,24 +49,24 @@
 
         internal static string GetMethodName(this LambdaExpression lambdaExpression)
         {
-            var unaryExpression = (UnaryExpression)lambdaExpression.Body;
-            var methodCallExpression = (MethodCallExpression)unaryExpression.Operand;
+            var unaryExpression = (UnaryExpression) lambdaExpression.Body;
+            var methodCallExpression = (MethodCallExpression) unaryExpression.Operand;
 
             if (methodCallExpression.Object == null)
             {
                 throw new Exception(ERR_CANT_GET_METHODINFO);
             }
 
-            var methodInfo = (System.Reflection.MethodInfo)((ConstantExpression)methodCallExpression.Object).Value;
+            var methodInfo = (MethodInfo) ((ConstantExpression) methodCallExpression.Object).Value;
 
             return methodInfo.Name;
         }
 
         private static object ConvertToConstant(Expression expression)
         {
-            UnaryExpression objectMember = Expression.Convert(expression, typeof(object));
-            Expression<Func<object>> getterLambda = Expression.Lambda<Func<object>>(objectMember);
-            Func<object> getter = getterLambda.Compile();
+            var objectMember = Expression.Convert(expression, typeof (object));
+            var getterLambda = Expression.Lambda<Func<object>>(objectMember);
+            var getter = getterLambda.Compile();
 
             return getter();
         }

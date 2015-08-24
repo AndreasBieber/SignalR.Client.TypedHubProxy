@@ -1,28 +1,21 @@
-﻿namespace SignalR.Client.TypedHubProxy.Tests.Utils
+﻿using System.Threading.Tasks;
+
+namespace SignalR.Client.TypedHubProxy.Tests.Utils
 {
     internal static class TaskAsyncHelper
     {
-        private static readonly System.Threading.Tasks.Task _emptyTask = MakeTask<object>(null);
+        public static Task Empty { get; } = MakeTask<object>(null);
 
-        public static System.Threading.Tasks.Task Empty
+        public static Task<T> FromResult<T>(T value)
         {
-            get
-            {
-                return _emptyTask;
-            }
-        }
-
-        public static System.Threading.Tasks.Task<T> FromResult<T>(T value)
-        {
-            var tcs = new System.Threading.Tasks.TaskCompletionSource<T>();
+            var tcs = new TaskCompletionSource<T>();
             tcs.SetResult(value);
             return tcs.Task;
         }
 
-        private static System.Threading.Tasks.Task<T> MakeTask<T>(T value)
+        private static Task<T> MakeTask<T>(T value)
         {
             return FromResult(value);
         }
-
     }
 }

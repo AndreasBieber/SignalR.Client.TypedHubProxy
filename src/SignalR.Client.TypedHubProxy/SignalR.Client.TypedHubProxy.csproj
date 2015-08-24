@@ -44,6 +44,10 @@
     <AssemblyOriginatorKeyFile>SignalR.Client.TypedHubProxy.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=9.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.9.2.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Client">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.2.1.2\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
     </Reference>
@@ -61,8 +65,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionDetail.cs" />
-    <Compile Include="Annotations.cs" />
-    <Compile Include="DisposableAction.cs" />
     <Compile Include="HubProxy.cs" />
     <Compile Include="SignalRExtensions.cs" />
     <Compile Include="IHubProxy.cs" />

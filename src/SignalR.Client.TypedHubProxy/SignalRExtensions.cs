@@ -3,7 +3,7 @@
 namespace Microsoft.AspNet.SignalR.Client
 {
     /// <summary>
-    /// Provides several extension methods.
+    ///     Provides several extension methods.
     /// </summary>
     [PublicAPI]
     public static class SignalRExtensions

@@ -1,14 +1,15 @@
-﻿namespace SignalR.Client.TypedHubProxy.Tests.TestFixtures
-{
-    using Microsoft.AspNet.SignalR.Client;
+﻿using Microsoft.AspNet.SignalR.Client;
+using SignalR.Client.TypedHubProxy.Tests.Contracts;
 
+namespace SignalR.Client.TypedHubProxy.Tests.TestFixtures
+{
     public class TypedHubProxyFixture : FixtureBase
     {
         public TypedHubProxyFixture()
         {
-            this.Proxy = HubProxyMock.Object.AsHubProxy<Contracts.IServerContract, Contracts.IClientContract>();
+            Proxy = HubProxyMock.Object.AsHubProxy<IServerContract, IClientContract>();
         }
 
-        public IHubProxy<Contracts.IServerContract, Contracts.IClientContract> Proxy { get; private set; }
+        public IHubProxy<IServerContract, IClientContract> Proxy { get; private set; }
     }
 }

@@ -4,8 +4,8 @@ namespace Microsoft.AspNet.SignalR.Client
 {
     internal class ObservableHubMessage<T> : IObservable<T>
     {
-        private readonly IHubProxy _proxy;
         private readonly string _eventName;
+        private readonly IHubProxy _proxy;
 
         public ObservableHubMessage(IHubProxy hubProxy, string eventName)
         {
