@@ -1,8 +1,11 @@
-﻿namespace Microsoft.AspNet.SignalR.Client
+﻿using JetBrains.Annotations;
+
+namespace Microsoft.AspNet.SignalR.Client
 {
     /// <summary>
     /// Provides several extension methods.
     /// </summary>
+    [PublicAPI]
     public static class SignalRExtensions
     {
         /// <summary>
