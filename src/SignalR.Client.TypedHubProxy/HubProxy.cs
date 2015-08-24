@@ -70,65 +70,6 @@ namespace Microsoft.AspNet.SignalR.Client
 
         #endregion
 
-        private IDisposable CreateSubscription(string eventName, Delegate callback, Delegate wherePredicate = null)
-        {
-            var callbackGenericArguments = callback.GetType().GetGenericArguments();
-            var relatedOnMethod = GetRelatedOnMethod(callbackGenericArguments);
-
-            var callbackToInvoke = wherePredicate == null
-                ? callback
-                : CreatePredicateWrapperDelegate(callback, wherePredicate, callbackGenericArguments);
-
-            // Invoke HubProxyExtensions.On
-            var invokeResult = relatedOnMethod.Invoke(null, new object[] {_hubProxy, eventName, callbackToInvoke});
-            return (IDisposable) invokeResult;
-        }
-
-        private MethodInfo GetRelatedOnMethod(params Type[] argumentTypes)
-        {
-            var methodInfos = typeof (HubProxyExtensions)
-                .GetMethods(BindingFlags.Static | BindingFlags.Public)
-                .Where(m => m.Name.Equals(nameof(HubProxyExtensions.On)));
-
-            if (argumentTypes.Any())
-            {
-                methodInfos = methodInfos.Where(
-                    m => m.GetParameters()
-                        .Last()
-                        .ParameterType
-                        .GenericTypeArguments
-                        .Count()
-                        .Equals(argumentTypes.Count()));
-            }
-
-            var method = methodInfos.First();
-
-            return method.IsGenericMethodDefinition ? method.MakeGenericMethod(argumentTypes) : method;
-        }
-
-        private Delegate CreatePredicateWrapperDelegate(Delegate originalDelegate, Delegate wherePredicate,
-            params Type[] argumentTypes)
-        {
-            // Create parameterexpressions for all callback-args
-            IEnumerable<ParameterExpression> parameterExpressions =
-                argumentTypes.Select(Expression.Parameter).ToList();
-
-            // Create invoke-expression to evaluate the where-predicate
-            var wherePredicateInvocation = Expression.Invoke(Expression.Constant(wherePredicate),
-                parameterExpressions);
-
-            // Create invoke-expression for the original callback
-            var callbackInvocation = Expression.Invoke(Expression.Constant(originalDelegate),
-                parameterExpressions);
-
-            // Create conditional-expression to evaluate the where-predicate. If the result is true, the original callback will be invoked
-            var invokeCallbackIfWherePredicateIsTrue = Expression.IfThen(
-                wherePredicateInvocation, callbackInvocation);
-
-            // Compile the expression to create the PredicateDelegate
-            return Expression.Lambda(invokeCallbackIfWherePredicateIsTrue, parameterExpressions).Compile();
-        }
-
         #region ITypedHubOneWayProxy implementations
 
         Task IHubProxyOneWay<TServerHubInterface>.CallAsync(
@@ -304,5 +245,64 @@ namespace Microsoft.AspNet.SignalR.Client
         }
 
         #endregion
+
+        private IDisposable CreateSubscription(string eventName, Delegate callback, Delegate wherePredicate = null)
+        {
+            var callbackGenericArguments = callback.GetType().GetGenericArguments();
+            var relatedOnMethod = GetRelatedOnMethod(callbackGenericArguments);
+
+            var callbackToInvoke = wherePredicate == null
+                ? callback
+                : CreatePredicateWrapperDelegate(callback, wherePredicate, callbackGenericArguments);
+
+            // Invoke HubProxyExtensions.On
+            var invokeResult = relatedOnMethod.Invoke(null, new object[] { _hubProxy, eventName, callbackToInvoke });
+            return (IDisposable)invokeResult;
+        }
+
+        private MethodInfo GetRelatedOnMethod(params Type[] argumentTypes)
+        {
+            var methodInfos = typeof(HubProxyExtensions)
+                .GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Where(m => m.Name.Equals(nameof(HubProxyExtensions.On)));
+
+            if (argumentTypes.Any())
+            {
+                methodInfos = methodInfos.Where(
+                    m => m.GetParameters()
+                        .Last()
+                        .ParameterType
+                        .GenericTypeArguments
+                        .Count()
+                        .Equals(argumentTypes.Count()));
+            }
+
+            var method = methodInfos.First();
+
+            return method.IsGenericMethodDefinition ? method.MakeGenericMethod(argumentTypes) : method;
+        }
+
+        private Delegate CreatePredicateWrapperDelegate(Delegate originalDelegate, Delegate wherePredicate,
+            params Type[] argumentTypes)
+        {
+            // Create parameterexpressions for all callback-args
+            IEnumerable<ParameterExpression> parameterExpressions =
+                argumentTypes.Select(Expression.Parameter).ToList();
+
+            // Create invoke-expression to evaluate the where-predicate
+            var wherePredicateInvocation = Expression.Invoke(Expression.Constant(wherePredicate),
+                parameterExpressions);
+
+            // Create invoke-expression for the original callback
+            var callbackInvocation = Expression.Invoke(Expression.Constant(originalDelegate),
+                parameterExpressions);
+
+            // Create conditional-expression to evaluate the where-predicate. If the result is true, the original callback will be invoked
+            var invokeCallbackIfWherePredicateIsTrue = Expression.IfThen(
+                wherePredicateInvocation, callbackInvocation);
+
+            // Compile the expression to create the PredicateDelegate
+            return Expression.Lambda(invokeCallbackIfWherePredicateIsTrue, parameterExpressions).Compile();
+        }
     }
 }
