@@ -25,9 +25,6 @@ using System.Runtime.InteropServices;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f45fcb60-7e77-4439-8eac-b254f57a3978")]
-
 // The following version numbers will be set/increased by the appveyor build process
 [assembly: AssemblyVersion("3.0.2")]
 [assembly: AssemblyFileVersion("0.0.0")]
