@@ -98,7 +98,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\IWrongClientContract.cs" />
     <Compile Include="Contracts\TestClientContract.cs" />
+    <Compile Include="Contracts\WrongClientContract.cs" />
     <Compile Include="TestFixtures\BaseFixture.cs" />
     <Compile Include="TestFixtures\ObservableHubProxyFixture.cs" />
     <Compile Include="TestFixtures\TypedHubProxyFixture.cs" />

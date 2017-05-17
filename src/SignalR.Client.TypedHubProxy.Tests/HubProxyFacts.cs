@@ -235,6 +235,16 @@ namespace SignalR.Client.TypedHubProxy.Tests
             subscriptions?.ToList().ForEach(s => s.Dispose());
         }
 
+        [Fact]
+        public void TestSubscribeOnAllShouldFailWhenTheClientInterfaceHasFunc()
+        {
+            var clientContract = new WrongClientContract();
+            IEnumerable<IDisposable> subscriptions = null;
+            Action act = () => subscriptions = _fixture.WrongProxy.SubscribeOnAll(clientContract)?.ToList();
+
+            act.ShouldThrow<NotSupportedException>();
+        }
+
         /// <summary>
         ///     Test bugfix for issue #9.
         /// </summary>

@@ -227,14 +227,20 @@ namespace Microsoft.AspNet.SignalR.Client
             foreach (var methodInfo in methodInfos)
             {
                 var parameterInfos = methodInfo.GetParameters();
+                var declaringType = methodInfo.DeclaringType?.FullName.Replace("+", ".");
 
                 if (parameterInfos.Count() > 7)
                 {
-                    var declaringType = methodInfo.DeclaringType?.FullName.Replace("+", ".");
                     var methodParameters = string.Join(", ",
                         methodInfo.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"));
                     throw new NotSupportedException(
                         $"Only interface methods with less or equal 7 parameters are supported: {declaringType}.{methodInfo.Name}({methodParameters})!");
+                }
+
+                if (methodInfo.ReturnType != typeof(void))
+                {
+                    throw new NotSupportedException(
+                        $"Interface methods of the client should return void, but the method \"{declaringType}.{methodInfo.Name}\" returns \"{methodInfo.ReturnType.Name}\".");
                 }
 
                 var actionType = Expression.GetActionType(parameterInfos.Select(p => p.ParameterType).ToArray());
