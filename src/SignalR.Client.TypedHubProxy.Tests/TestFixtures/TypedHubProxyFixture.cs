@@ -8,8 +8,11 @@ namespace SignalR.Client.TypedHubProxy.Tests.TestFixtures
         public TypedHubProxyFixture()
         {
             Proxy = HubProxyMock.Object.AsHubProxy<IServerContract, IClientContract>();
+            WrongProxy = HubProxyMock.Object.AsHubProxy<IServerContract, IWrongClientContract>();
         }
 
         public IHubProxy<IServerContract, IClientContract> Proxy { get; private set; }
+
+        public IHubProxy<IServerContract, IWrongClientContract> WrongProxy { get; private set; }
     }
 }
