@@ -11,9 +11,6 @@ or
 
     Install-Package SignalR.Client.TypedHubProxy
 
-## LICENSE
-[Apache 2.0 License](https://github.com/Gandalis/SignalR.Client.TypedHubProxy/blob/master/LICENSE.md)
-
 ## Example
 First of all we have to declare the interfaces:
 
