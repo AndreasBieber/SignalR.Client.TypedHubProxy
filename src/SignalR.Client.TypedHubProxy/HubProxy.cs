@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -28,14 +27,14 @@ namespace Microsoft.AspNet.SignalR.Client
         /// <exception cref="ArgumentException"></exception>
         public HubProxy(IHubProxy hubProxy)
         {
-            if (!typeof (TServerHubInterface).IsInterface)
+            if (!typeof(TServerHubInterface).GetTypeInfo().IsInterface)
             {
-                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof (TServerHubInterface).Name));
+                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof(TServerHubInterface).Name));
             }
 
-            if (!typeof (TClientInterface).IsInterface)
+            if (!typeof(TClientInterface).GetTypeInfo().IsInterface)
             {
-                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof (TClientInterface).Name));
+                throw new ArgumentException(string.Format(ERR_NOT_AN_INTERFACE, typeof(TClientInterface).Name));
             }
 
 
@@ -218,11 +217,11 @@ namespace Microsoft.AspNet.SignalR.Client
 
             if (!(instance is TClientInterface))
             {
-                throw new ConstraintException(
-                    $"{instance.GetType().Name} doesn't implements the interface {typeof (TClientInterface).Name}.");
+                throw new ArgumentException(
+                    $"{instance.GetType().Name} doesn't implements the interface {typeof(TClientInterface).Name}.");
             }
 
-            var methodInfos = typeof (TClientInterface).GetMethods();
+            var methodInfos = typeof(TClientInterface).GetRuntimeMethods();
 
             foreach (var methodInfo in methodInfos)
             {
@@ -244,7 +243,8 @@ namespace Microsoft.AspNet.SignalR.Client
                 }
 
                 var actionType = Expression.GetActionType(parameterInfos.Select(p => p.ParameterType).ToArray());
-                var actionDelegate = Delegate.CreateDelegate(actionType, instance, methodInfo);
+                //var actionDelegate = MethodInfo.CreateDelegate(actionType, instance, methodInfo);
+                var actionDelegate = methodInfo.CreateDelegate(actionType, instance);
 
                 yield return CreateSubscription(methodInfo.Name, actionDelegate);
             }
@@ -254,7 +254,7 @@ namespace Microsoft.AspNet.SignalR.Client
 
         private IDisposable CreateSubscription(string eventName, Delegate callback, Delegate wherePredicate = null)
         {
-            var callbackGenericArguments = callback.GetType().GetGenericArguments();
+            var callbackGenericArguments = callback.GetType().GetTypeInfo().GenericTypeArguments;
             var relatedOnMethod = GetRelatedOnMethod(callbackGenericArguments);
 
             var callbackToInvoke = wherePredicate == null
@@ -269,8 +269,8 @@ namespace Microsoft.AspNet.SignalR.Client
         private MethodInfo GetRelatedOnMethod(params Type[] argumentTypes)
         {
             var methodInfos = typeof(HubProxyExtensions)
-                .GetMethods(BindingFlags.Static | BindingFlags.Public)
-                .Where(m => m.Name.Equals(nameof(HubProxyExtensions.On)));
+                .GetRuntimeMethods()
+                .Where(m => (m.IsStatic || m.IsPublic) && m.Name.Equals(nameof(HubProxyExtensions.On)));
 
             if (argumentTypes.Any())
             {
